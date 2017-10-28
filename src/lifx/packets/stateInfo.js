@@ -1,8 +1,8 @@
 'use strict';
 
-var utils = require('../../lifx').utils;
+const utils = require('../../lifx').utils;
 
-var Packet = {
+const Packet = {
   size: 24
 };
 
@@ -11,8 +11,8 @@ Packet.parseNanoseconds = function(buf) {
     throw new Error('Invalid length given for nanoseconds field');
   }
 
-  var low = buf.readUInt32LE(0);
-  var high = buf.readUInt32LE(4);
+  const low = buf.readUInt32LE(0);
+  const high = buf.readUInt32LE(4);
 
   return (high * 2 * 32 + low) / 1.0E9;
 };
@@ -23,8 +23,8 @@ Packet.parseNanoseconds = function(buf) {
  * @return {Object}     Information contained in packet
  */
 Packet.toObject = function(buf) {
-  var obj = {};
-  var offset = 0;
+  const obj = {};
+  let offset = 0;
 
   // Check length
   if (buf.length !== this.size) {
