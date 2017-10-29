@@ -8,22 +8,22 @@ const {assign, pick} = require('lodash');
  */
 class Light {
   /**
-   * @param {Object} constr constructor object
-   * @param {Lifx/Client} constr.client the client the light belongs to
-   * @param {String} constr.id the id used to target the light
-   * @param {String} constr.address ip address of the light
-   * @param {Number} constr.port port of the light
-   * @param {Number} constr.seenOnDiscovery on which discovery the light was last seen
+   * @param {Object} options constructor object
+   * @param {Lifx/Client} options.client the client the light belongs to
+   * @param {String} options.id the id used to target the light
+   * @param {String} options.address ip address of the light
+   * @param {Number} options.port port of the light
+   * @param {Number} options.seenOnDiscovery on which discovery the light was last seen
    */
-  constructor(constr) {
-    this.client = constr.client;
-    this.id = constr.id; // Used to target the light
-    this.address = constr.address;
-    this.port = constr.port;
+  constructor(options) {
+    this.client = options.client;
+    this.id = options.id; // Used to target the light
+    this.address = options.address;
+    this.port = options.port;
     this.label = null;
     this.status = 'on';
 
-    this.seenOnDiscovery = constr.seenOnDiscovery;
+    this.seenOnDiscovery = options.seenOnDiscovery;
   }
 
   /**
