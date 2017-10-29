@@ -3,7 +3,9 @@
 const util = require('util');
 const dgram = require('dgram');
 const EventEmitter = require('eventemitter3');
-const {defaults, isArray, isBoolean, isString, result, find, bind, forEach, keys, isNil, every} = require('lodash');
+const {
+  defaults, isArray, isBoolean, isString, isNil, result, find, bind, forEach, keys, every, includes, filter
+} = require('lodash');
 const Packet = require('../lifx').packet;
 const {Light, constants, utils} = require('../lifx');
 
@@ -465,7 +467,7 @@ Client.prototype.processDiscoveryPacket = function(err, msg, rinfo) {
 
     // Check if discovery should be stopped
     if (this.stopAfterDiscovery && !this.discoveryCompleted) {
-      if (this.lightsDiscoveredAndOnline()) {
+      if (this.predefinedDiscoveredAndOnline()) {
         this.emit('discovery-completed');
         this.stopDiscovery();
         this.discoveryCompleted = true;
@@ -501,15 +503,13 @@ Client.prototype.stopDiscovery = function() {
  * Checks if all predefined lights are discovered and online
  * @return {Boolean} are lights discovered and online
  */
-Client.prototype.lightsDiscoveredAndOnline = function() {
-  const lightsDiscovered = keys(this.devices).length;
-  const allDiscovered = lightsDiscovered >= this.lightAddresses.length;
-  const allOnline = every(this.devices, function(device) {
-    return device.status === 'on';
-  });
-  const labelsReceived = every(this.devices, function(device) {
-    return isString(device.label);
-  });
+Client.prototype.predefinedDiscoveredAndOnline = function() {
+  const predefinedDevices = filter(this.devices, (device) => includes(this.lightAddresses, device.address));
+
+  const numDiscovered = keys(this.devices).length;
+  const allDiscovered = numDiscovered >= this.lightAddresses.length;
+  const allOnline = every(predefinedDevices, (device) => device.status === 'on');
+  const labelsReceived = every(predefinedDevices, (device) => isString(device.label));
 
   return allDiscovered && allOnline && labelsReceived;
 };
