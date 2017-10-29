@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "eventemitter3": "^2.0.3",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "postinstall-build": "^5.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -51,7 +52,8 @@
     "build": "npm run prebuild && babel src --out-dir lib",
     "build:watch": "npm run build -- --watch",
     "clean": "rimraf lib",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
+    "postinstall": "postinstall-build lib",
     "lint": "eslint src/ test/ example/ cli.js",
     "lint:fix": "npm run lint -- --fix",
     "pretest": "npm run lint && npm run build",
