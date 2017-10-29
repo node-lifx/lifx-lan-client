@@ -3,7 +3,7 @@
 const util = require('util');
 const dgram = require('dgram');
 const EventEmitter = require('eventemitter3');
-const {defaults, isArray, result, find, bind, forEach, keys, isNil} = require('lodash');
+const {defaults, isArray, isBoolean, isString, result, find, bind, forEach, keys, isNil, every} = require('lodash');
 const Packet = require('../lifx').packet;
 const {Light, constants, utils} = require('../lifx');
 
@@ -40,6 +40,9 @@ function Client() {
   this.resendMaxTimes = 5;
   this.source = utils.getRandomHexString(8);
   this.broadcastAddress = '255.255.255.255';
+  this.lightAddresses = [];
+  this.stopAfterDiscovery = false;
+  this.discoveryCompleted = false;
 }
 util.inherits(Client, EventEmitter);
 
@@ -58,6 +61,7 @@ util.inherits(Client, EventEmitter);
  * @param {String} [options.source] The source to send to light, must be 8 chars lowercase or digit
  * @param {Boolean} [options.startDiscovery] Weather to start discovery after initialization or not
  * @param {Array} [options.lights] Pre set list of ip addresses of known addressable lights
+ * @param {Boolean} [options.stopAfterDiscovery] Stop discovery after discovering known addressable lights defined with options.light
  * @param {String} [options.broadcast] The broadcast address to use for light discovery
  * @param {Number} [options.sendPort] The port to send messages to
  * @param {Function} [callback] Called after initialation
@@ -72,6 +76,7 @@ Client.prototype.init = function(options, callback) {
     source: '',
     startDiscovery: true,
     lights: [],
+    stopAfterDiscovery: false,
     broadcast: '255.255.255.255',
     sendPort: constants.LIFX_DEFAULT_PORT,
     resendPacketDelay: 150,
@@ -134,6 +139,13 @@ Client.prototype.init = function(options, callback) {
         throw new TypeError('LIFX Client lights option array element \'' + light + '\' is not expected IPv4 format');
       }
     });
+    this.lightAddresses = opts.lights;
+
+    if (!isBoolean(opts.stopAfterDiscovery)) {
+      throw new TypeError('LIFX Client stopAfterDiscovery must be a boolean');
+    } else {
+      this.stopAfterDiscovery = opts.stopAfterDiscovery;
+    }
   }
 
   if (opts.source !== '') {
@@ -358,6 +370,14 @@ Client.prototype.startDiscovery = function(lights) {
 };
 
 /**
+ * Checks if light discovery is in progress
+ * @return {Boolean} is discovery in progress
+ */
+Client.prototype.isDiscovering = function() {
+  return this.discoveryTimer !== null;
+};
+
+/**
  * Checks all registered message handlers if they request the given message
  * @param  {Object} msg message to check handler for
  * @param  {Object} rinfo rinfo address info to check handler for
@@ -442,6 +462,15 @@ Client.prototype.processDiscoveryPacket = function(err, msg, rinfo) {
       this.devices[msg.target].address = rinfo.address;
       this.devices[msg.target].seenOnDiscovery = this.discoveryPacketSequence;
     }
+
+    // Check if discovery should be stopped
+    if (this.stopAfterDiscovery && !this.discoveryCompleted) {
+      if (this.lightsDiscoveredAndOnline()) {
+        this.emit('discovery-completed');
+        this.stopDiscovery();
+        this.discoveryCompleted = true;
+      }
+    }
   }
 };
 
@@ -466,6 +495,23 @@ Client.prototype.processLabelPacket = function(err, msg) {
 Client.prototype.stopDiscovery = function() {
   clearInterval(this.discoveryTimer);
   this.discoveryTimer = null;
+};
+
+/**
+ * Checks if all predefined lights are discovered and online
+ * @return {Boolean} are lights discovered and online
+ */
+Client.prototype.lightsDiscoveredAndOnline = function() {
+  const lightsDiscovered = keys(this.devices).length;
+  const allDiscovered = lightsDiscovered >= this.lightAddresses.length;
+  const allOnline = every(this.devices, function(device) {
+    return device.status === 'on';
+  });
+  const labelsReceived = every(this.devices, function(device) {
+    return isString(device.label);
+  });
+
+  return allDiscovered && allOnline && labelsReceived;
 };
 
 /**
