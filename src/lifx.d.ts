@@ -196,7 +196,7 @@ export class Light {
   * Requests ambient light value of the light
   * @param {Function} callback a function to accept the data
   */
-  getAmbientLight(callback: any): any;
+  getAmbientLight(callback: any): void;
 
   /**
   * Requests the current color zone state of the light
@@ -204,26 +204,26 @@ export class Light {
   * @param {Number} [endIndex] end color zone index
   * @param {Function} callback a function to accept the data
   */
-  getColorZones(startIndex: any, endIndex: any, callback: any): any;
+  getColorZones(startIndex: any, endIndex: any, callback: any): void;
 
   /**
   * Requests infos from the microcontroller unit of the light
   * @param {Function} callback a function to accept the data
   */
-  getFirmwareInfo(callback: any): any;
+  getFirmwareInfo(callback: any): void;
 
   /**
   * Requests used version from the microcontroller unit of the light
   * @param {Function} callback a function to accept the data
   */
-  getFirmwareVersion(callback: any): any;
+  getFirmwareVersion(callback: any): void;
 
   /**
   * Requests hardware info from the light
   * @param {Function} callback a function to accept the data with error and
   *                   message as parameters
   */
-  getHardwareVersion(callback: any): any;
+  getHardwareVersion(callback: any): void;
 
   /**
   * Requests the label of the light
@@ -231,38 +231,44 @@ export class Light {
   * @param {Boolean} [cache=false] return cached result if existent
   * @return {Function} callback(err, label)
   */
-  getLabel(callback: any, cache: any): any;
+  getLabel(callback: any, cache: any): void;
 
   /**
   * Requests the current maximum setting for the infrared channel
   * @param  {Function} callback a function to accept the data
   */
-  getMaxIR(callback: any): any;
+  getMaxIR(callback: any): void;
 
   /**
   * Requests the power level of the light
   * @param {Function} callback a function to accept the data
   */
-  getPower(callback: any): any;
+  getPower(callback: any): void;
 
   /**
   * Requests the current state of the light
   * @param {Function} callback a function to accept the data
   */
-  getState(callback: any): any;
+  getState(callback: any): void;
+
+  /**
+  * Requests uptime from the light
+  * @param {Function} callback a function to accept the data with error and message as parameters
+  */
+  getUptime(callback: any): void;
 
   /**
   * Requests wifi infos from for the light
   * @param {Function} callback a function to accept the data
   */
-  getWifiInfo(callback: any): any;
+  getWifiInfo(callback: any): void;
 
 
   /**
   * Requests used version from the wifi controller unit of the light (wifi firmware version)
   * @param {Function} callback a function to accept the data
   */
-  getWifiVersion(callback: any): any;
+  getWifiVersion(callback: any): void;
 
   /**
   * Sets the Maximum Infrared brightness
@@ -294,6 +300,12 @@ export class Light {
   * @param {Function} [callback] called when light did receive message
   */
   setLabel(label: any, callback: any): void;
+
+  /**
+  * Reboots the light
+  * @param {Function} callback called when light did receive message
+  */
+  reboot(callback: any): void;
 }
 
 export const constants: {
