@@ -257,7 +257,7 @@ suite('Light', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
 
-     // Error cases
+    // Error cases
     assert.throw(() => {
       // No arguments
       bulb.maxIR();
