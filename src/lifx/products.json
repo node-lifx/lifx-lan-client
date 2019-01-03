@@ -1,3 +1,6 @@
+// 20190104005421
+// https://raw.githubusercontent.com/LIFX/products/master/products.json
+
 [
   {
     "vid": 1,
@@ -9,7 +12,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -18,7 +26,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -27,7 +40,12 @@
         "features": {
           "color": false,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2700,
+            6500
+          ],
+          "chain": false
         }
       },
       {
@@ -36,7 +54,12 @@
         "features": {
           "color": false,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2700,
+            6500
+          ],
+          "chain": false
         }
       },
       {
@@ -45,7 +68,12 @@
         "features": {
           "color": false,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2700,
+            6500
+          ],
+          "chain": false
         }
       },
       {
@@ -54,7 +82,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -63,7 +96,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -72,7 +110,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -81,7 +124,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -90,7 +138,12 @@
         "features": {
           "color": true,
           "infrared": true,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -99,7 +152,12 @@
         "features": {
           "color": true,
           "infrared": true,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -108,7 +166,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": true
+          "multizone": true,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -117,7 +180,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": true
+          "multizone": true,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -126,7 +194,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -135,7 +208,26 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
+        }
+      },
+      {
+        "pid": 38,
+        "name": "LIFX Beam",
+        "features": {
+          "color": true,
+          "infrared": false,
+          "multizone": true,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -144,7 +236,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -153,7 +250,12 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -162,7 +264,12 @@
         "features": {
           "color": true,
           "infrared": true,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -171,7 +278,12 @@
         "features": {
           "color": true,
           "infrared": true,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
@@ -180,25 +292,40 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
         }
       },
       {
         "pid": 50,
-        "name": "LIFX Mini White",
-        "features": {
-          "color": false,
-          "infrared": false,
-          "multizone": false
-        }
-      },
-      {
-        "pid": 51,
         "name": "LIFX Mini Day and Dusk",
         "features": {
           "color": false,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            1500,
+            4000
+          ],
+          "chain": false
+        }
+      },
+      {
+        "pid": 51,
+        "name": "LIFX Mini White",
+        "features": {
+          "color": false,
+          "infrared": false,
+          "multizone": false,
+          "temperature_range": [
+            2700,
+            2700
+          ],
+          "chain": false
         }
       },
       {
@@ -207,7 +334,82 @@
         "features": {
           "color": true,
           "infrared": false,
-          "multizone": false
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
+        }
+      },
+      {
+        "pid": 55,
+        "name": "LIFX Tile",
+        "features": {
+          "color": true,
+          "infrared": false,
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": true
+        }
+      },
+      {
+        "pid": 56,
+        "name": "LIFX Beam",
+        "features": {
+          "color": true,
+          "infrared": false,
+          "multizone": true,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
+        }
+      },
+      {
+        "pid": 59,
+        "name": "LIFX Mini Color",
+        "features": {
+          "color": true,
+          "infrared": false,
+          "multizone": false,
+          "temperature_range": [
+            2500,
+            9000
+          ],
+          "chain": false
+        }
+      },
+      {
+        "pid": 60,
+        "name": "LIFX Mini Day and Dusk",
+        "features": {
+          "color": false,
+          "infrared": false,
+          "multizone": false,
+          "temperature_range": [
+            1500,
+            4000
+          ],
+          "chain": false
+        }
+      },
+      {
+        "pid": 61,
+        "name": "LIFX Mini White",
+        "features": {
+          "color": false,
+          "infrared": false,
+          "multizone": false,
+          "temperature_range": [
+            2700,
+            2700
+          ],
+          "chain": false
         }
       }
     ]
