@@ -1,7 +1,7 @@
 'use strict';
 
-var utils = require('../../').utils;
-var assert = require('chai').assert;
+const utils = require('../../').utils;
+const assert = require('chai').assert;
 
 suite('Utils', () => {
   test('create a random hex string', () => {
@@ -41,6 +41,26 @@ suite('Utils', () => {
   });
 
   test('rgb hex string to object with decimal rgb values', () => {
+    assert.throw(() => {
+      // No string as argument
+      utils.rgbHexStringToObject(111);
+    }, TypeError);
+
+    assert.throw(() => {
+      // No leading # char
+      utils.rgbHexStringToObject('FFF');
+    }, RangeError);
+
+    assert.throw(() => {
+      // Invalid hex string
+      utils.rgbHexStringToObject('#FFDF');
+    });
+
+    assert.throw(() => {
+      // Invalid hex string
+      utils.rgbHexStringToObject('#FFFFFFD');
+    });
+
     assert.deepEqual(utils.rgbHexStringToObject('#FFF'), {r: 255, g: 255, b: 255});
     assert.deepEqual(utils.rgbHexStringToObject('#fff'), {r: 255, g: 255, b: 255});
     assert.deepEqual(utils.rgbHexStringToObject('#000'), {r: 0, g: 0, b: 0});

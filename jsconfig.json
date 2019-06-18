@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": [
+    "node_modules",
+    "test",
+    "tmp",
+    "lib"
+  ],
+  "typeAcquisition": {
+    "enable": true
+  }
+}
