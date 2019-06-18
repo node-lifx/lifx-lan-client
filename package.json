@@ -8,21 +8,21 @@
   },
   "dependencies": {
     "eventemitter3": "^2.0.3",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "postinstall-build": "^5.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.1",
-    "babel-preset-env": "^1.6.1",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.1",
+    "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
     "codecov.io": "^0.1.6",
-    "eslint": "^4.10.0",
+    "eslint": "^5.16.0",
     "istanbul": "^0.4.0",
     "lolex": "^1.6.0",
     "mkdirp": "^0.5.1",
-    "mocha": "^3.5.3",
+    "mocha": "^6.1.4",
     "rimraf": "^2.6.2",
     "sinon": "^4.0.2"
   },
