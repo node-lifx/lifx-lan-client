@@ -1,10 +1,10 @@
 {
-  "name": "node-lifx",
-  "description": "Node.js implementation of the LIFX protocol",
-  "version": "0.8.0",
+  "name": "lifx-lan-client",
+  "description": "Node.js implementation of the LIFX LAN protocol",
+  "version": "1.0.0",
   "author": "Marius Rumpf <marius@mariusrumpf.de>",
   "bugs": {
-    "url": "https://github.com/MariusRumpf/node-lifx/issues"
+    "url": "https://github.com/node-lifx/lifx-lan-client/issues"
   },
   "dependencies": {
     "eventemitter3": "^2.0.3",
@@ -31,9 +31,10 @@
     "lib": "lib",
     "example": "example"
   },
-  "homepage": "https://github.com/MariusRumpf/node-lifx#readme",
+  "homepage": "https://github.com/node-lifx/lifx-lan-client#readme",
   "keywords": [
     "bulb",
+    "lan",
     "lifx",
     "light",
     "lightbulb"
@@ -46,7 +47,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MariusRumpf/node-lifx.git"
+    "url": "git+https://github.com/node-lifx/lifx-lan-client.git"
   },
   "scripts": {
     "prebuild": "npm run clean && mkdirp lib/lifx && cp src/lifx/products.json lib/lifx",
