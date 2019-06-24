@@ -1,4 +1,4 @@
-# LIFX Node.js Library
+# LIFX LAN Node.js Library
 
 [![NPM Version](https://img.shields.io/npm/v/node-lifx.svg)](https://www.npmjs.com/package/node-lifx)
 [![Build Status](https://img.shields.io/travis/MariusRumpf/node-lifx/master.svg)](https://travis-ci.org/MariusRumpf/node-lifx)
