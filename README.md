@@ -1,11 +1,11 @@
 # LIFX LAN Node.js Library
 
-[![NPM Version](https://img.shields.io/npm/v/node-lifx.svg)](https://www.npmjs.com/package/node-lifx)
-[![Build Status](https://img.shields.io/travis/MariusRumpf/node-lifx/master.svg)](https://travis-ci.org/MariusRumpf/node-lifx)
-[![Build status](https://img.shields.io/appveyor/ci/MariusRumpf/node-lifx/master.svg)](https://ci.appveyor.com/project/MariusRumpf/node-lifx)
-[![Dependency Status](https://dependencyci.com/github/MariusRumpf/node-lifx/badge)](https://dependencyci.com/github/MariusRumpf/node-lifx)
-[![codecov.io](https://img.shields.io/codecov/c/github/MariusRumpf/node-lifx/master.svg)](https://codecov.io/github/MariusRumpf/node-lifx?branch=master)
-[![Gitter Chat](https://img.shields.io/gitter/room/node-lifx/Lobby.svg)](https://gitter.im/node-lifx/Lobby)
+[![NPM Version](https://img.shields.io/npm/v/lifx-lan-client.svg)](https://www.npmjs.com/package/lifx-lan-client)
+[![Build Status](https://img.shields.io/travis/MariusRumpf/lifx-lan-client/master.svg)](https://travis-ci.org/MariusRumpf/lifx-lan-client)
+[![Build status](https://img.shields.io/appveyor/ci/MariusRumpf/lifx-lan-client/master.svg)](https://ci.appveyor.com/project/MariusRumpf/lifx-lan-client)
+[![Dependency Status](https://dependencyci.com/github/MariusRumpf/lifx-lan-client/badge)](https://dependencyci.com/github/MariusRumpf/lifx-lan-client)
+[![codecov.io](https://img.shields.io/codecov/c/github/MariusRumpf/lifx-lan-client/master.svg)](https://codecov.io/github/MariusRumpf/lifx-lan-client?branch=master)
+[![Gitter Chat](https://img.shields.io/gitter/room/lifx-lan-client/Lobby.svg)](https://gitter.im/lifx-lan-client/Lobby)
 
 
 A Node.js implementation of the [LIFX protocol](https://github.com/LIFX/lifx-protocol-docs). Developed to work with a minimum firmware version of 2.0.
@@ -15,7 +15,11 @@ This library is not, in any way, affiliated or related to LiFi Labs, Inc.. Use i
 ## Installation
 
 ```sh
-$ npm install node-lifx --save
+$ npm install lifx-lan-client --save
+```
+
+```sh
+$ yarn add lifx-lan-client
 ```
 
 ## Compatibility
@@ -29,7 +33,7 @@ The file `cli.js` contains a working example.
 ### Client
 The library uses a client for network communication. This client handles communication with all lights in the network.
 ```js
-var LifxClient = require('node-lifx').Client;
+var LifxClient = require('lifx-lan-client').Client;
 var client = new LifxClient();
 
 client.init();
@@ -38,7 +42,7 @@ The `Client` object is an EventEmitter and emmits events whenever any changes oc
 The client starts discovery of lights right after it is initialized with the `init` method. If a new light is found the client emmits a `light-new` event. This event contains the light as an object on which methods can be called then:
 
 ```js
-var LifxClient = require('node-lifx').Client;
+var LifxClient = require('lifx-lan-client').Client;
 var client = new LifxClient();
 
 client.on('light-new', function(light) {
@@ -388,7 +392,7 @@ Stops the discovery process.
 For the initialization of the client different settings can be provided. This is an example with the default options:
 
 ```js
-var LifxClient = require('node-lifx').Client;
+var LifxClient = require('lifx-lan-client').Client;
 var client = new LifxClient();
 
 // ...
