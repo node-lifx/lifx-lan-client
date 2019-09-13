@@ -529,4 +529,162 @@ Light.prototype.colorZones = function(startIndex, endIndex, hue, saturation, bri
   this.client.send(packetObj, callback);
 };
 
+/**
+ * Requests tile getDeviceChain 701
+ * @param {Function} callback a function to accept the data
+ */
+Light.prototype.getDeviceChain = function(callback) {
+  validate.callback(callback, 'light getDeviceChain method');
+
+  const packetObj = packet.create('getDeviceChain', {}, this.client.source);
+  packetObj.target = this.id;
+  const sqnNumber = this.client.send(packetObj);
+  this.client.addMessageHandler('stateDeviceChain', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, msg);
+  }, sqnNumber);
+};
+
+/**
+ * Sets Tile Position
+ * @example light.setUserPosition(0, 12, 13, 0, () => {})
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {Number} userX	32-bit float
+ * @param {Number} userY	32-bit float
+ * @param {Number} reserved	16-bit integer
+ * @param {Function} callback called when light did receive message
+ */
+Light.prototype.setUserPosition = function(tileIndex, userX, userY, reserved, callback) {
+  if (tileIndex === undefined || typeof tileIndex !== 'number') {
+    throw new TypeError('LIFX light setUserPosition tileIndex to be a number');
+  }
+  if (userX === undefined || typeof userX !== 'number') {
+    throw new TypeError('LIFX light setUserPosition userX to be a number');
+  }
+  if (userY === undefined || typeof userY !== 'number') {
+    throw new TypeError('LIFX light setUserPosition userY to be a number');
+  }
+  validate.optionalCallback(callback, 'light setUserPosition method');
+
+  const packetObj = packet.create('setUserPositiion', {
+    tileIndex,
+    userX,
+    userY,
+    reserved: reserved || 0
+  }, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/**
+ * Requests tile GetTileState64 707
+ *
+ * Get the state of 64 pixels in the tile in a rectangle that has
+ * a starting point and width.
+ * The tileIndex is used to control the starting tile in the chain
+ * and length is used to get the state of that many tiles beginning
+ * from the tileIndex. This will result in a separate response from
+ * each tile.
+ * For the LIFX Tile it really only makes sense to set x and y to
+ * zero, and width to 8.
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {Number} length	unsigned 8-bit integer
+ * @param {Number} x	unsigned 8-bit integer
+ * @param {Number} y	unsigned 8-bit integer
+ * @param {Number} width	unsigned 8-bit integer
+ * @param {Number} reserved	unsigned 8-bit integer
+ * @param {Function} callback a function to accept the data
+ */
+Light.prototype.getTileState64 = function(tileIndex, length, x, y, width, reserved, callback) {
+  if (tileIndex === undefined || typeof tileIndex !== 'number') {
+    throw new TypeError('LIFX light getTileState64 tileIndex to be a number');
+  }
+  if (length === undefined || typeof length !== 'number') {
+    throw new TypeError('LIFX light getTileState64 length to be a number');
+  }
+  if (x === undefined || typeof x !== 'number') {
+    throw new TypeError('LIFX light getTileState64 x to be a number');
+  }
+  if (y === undefined || typeof y !== 'number') {
+    throw new TypeError('LIFX light getTileState64 y to be a number');
+  }
+  if (width === undefined || typeof width !== 'number') {
+    throw new TypeError('LIFX light getTileState64 width to be a number');
+  }
+  validate.callback(callback, 'light getTileState64 method');
+
+  const packetObj = packet.create('getTileState64', {
+    tileIndex,
+    length,
+    reserved: reserved || 0,
+    x,
+    y,
+    width
+  },
+  this.client.source
+  );
+  packetObj.target = this.id;
+  const sqnNumber = this.client.send(packetObj);
+  this.client.addMessageHandler('stateTileState64', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, msg);
+  }, sqnNumber);
+};
+
+/**
+ * This lets you set 64 pixels from a starting x and y for
+ * a rectangle with the specified width.
+ * For the LIFX Tile it really only makes sense to set x
+ * and y to zero, and width to 8.
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {Number} length	unsigned 8-bit integer
+ * @param {Number} x	unsigned 8-bit integer
+ * @param {Number} y	unsigned 8-bit integer
+ * @param {Number} width	unsigned 8-bit integer
+ * @param {Number} duration	unsigned 32-bit integer
+ * @param {Number} colors[64]	64 HSBK values
+ * @param {Number} reserved	unsigned 8-bit integer
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.setTileState64 = function(tileIndex, length, x, y, width, duration, colors, reserved, callback) {
+  if (tileIndex === undefined || typeof tileIndex !== 'number') {
+    throw new TypeError('LIFX light setTileState64 tileIndex to be a number');
+  }
+  if (length === undefined || typeof length !== 'number') {
+    throw new TypeError('LIFX light setTileState64 length to be a number');
+  }
+  if (x === undefined || typeof x !== 'number') {
+    throw new TypeError('LIFX light setTileState64 x to be a number');
+  }
+  if (y === undefined || typeof y !== 'number') {
+    throw new TypeError('LIFX light setTileState64 y to be a number');
+  }
+  if (width === undefined || typeof width !== 'number') {
+    throw new TypeError('LIFX light setTileState64 width to be a number');
+  }
+  if (duration === undefined || typeof duration !== 'number') {
+    throw new TypeError('LIFX light setTileState64 duration to be a number');
+  }
+  const set64colors = utils.buildColorsHsbk(colors, 64);
+
+  validate.optionalCallback(callback, 'light setTileState64 method');
+
+  const packetObj = packet.create('setTileState64', {
+    tileIndex,
+    length,
+    reserved: reserved || 0,
+    x,
+    y,
+    width,
+    duration,
+    colors: set64colors
+  }, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
 exports.Light = Light;
