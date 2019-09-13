@@ -89,6 +89,12 @@ Packet.typeList = [
   // {id: 507, name: 'getEffectZone'},
   {id: 508, name: 'setMultiZoneEffect'},
   // {id: 509, name: 'stateEffectZone'},
+  {id: 701, name: 'getDeviceChain'},
+  {id: 702, name: 'stateDeviceChain'},
+  {id: 706, name: 'setUserPosition'},
+  {id: 707, name: 'getTileState64'},
+  {id: 711, name: 'stateTileState64'},
+  {id: 715, name: 'setTileState64'},
   {id: 816, name: 'getRelayPower'},
   {id: 817, name: 'setRelayPower'},
   {id: 818, name: 'stateRelayPower'}

@@ -81,6 +81,13 @@ packets.setColorZones = require('./setColorZones');
 packets.stateZone = require('./stateZone');
 packets.stateMultiZone = require('./stateMultiZone');
 
+packets.getDeviceChain = require('./getDeviceChain');
+packets.stateDeviceChain = require('./stateDeviceChain');
+
+packets.setTileState64 = require('./setTileState64');
+packets.getTileState64 = require('./getTileState64');
+packets.stateTileState64 = require('./stateTileState64');
+
 /*
  * LIFX Switch device related packages
  */
