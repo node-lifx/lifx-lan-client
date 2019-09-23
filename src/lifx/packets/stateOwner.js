@@ -38,7 +38,7 @@ Packet.toObject = function(buf) {
  * @return {Buffer}     packet
  */
 Packet.toBuffer = function(obj) {
-  const buf = new Buffer(this.size);
+  const buf = Buffer.alloc(this.size);
   buf.fill(0);
   let offset = 0;
 

@@ -181,7 +181,7 @@ Packet.toObject = function(buf) {
  * @return {Buffer} packet header buffer
  */
 Packet.headerToBuffer = function(obj) {
-  const buf = new Buffer(36);
+  const buf = Buffer.alloc(36);
   buf.fill(0);
   let offset = 0;
 
