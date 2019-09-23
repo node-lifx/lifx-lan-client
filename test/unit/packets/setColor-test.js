@@ -3,9 +3,9 @@
 const Packet = require('../../../').packet;
 const assert = require('chai').assert;
 
-suite('Packet setColor', () => {
-  suite('create', () => {
-    test('valid colors', () => {
+describe('Packet setColor', () => {
+  describe('create', () => {
+    it('valid colors', () => {
       let packet;
       packet = Packet.create('setColor', {
         hue: 5686,
@@ -36,7 +36,7 @@ suite('Packet setColor', () => {
       assert.equal(packet.type, 102);
     });
 
-    test('invalid colors', () => {
+    it('invalid colors', () => {
       assert.throw(() => {
         const obj = Packet.create('setColor', {
           hue: 0,
