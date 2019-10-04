@@ -3,9 +3,9 @@
 const Packet = require('../../../').packet;
 const assert = require('chai').assert;
 
-suite('Packet getService', () => {
-  suite('create', () => {
-    test('general', () => {
+describe('Packet getService', () => {
+  describe('create', () => {
+    it('general', () => {
       const packet = Packet.create('getService', {}, 'ff2c4807');
       assert.equal(packet.size, 36);
       assert.equal(packet.type, 2);

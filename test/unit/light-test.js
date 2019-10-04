@@ -5,7 +5,7 @@ const Light = require('../../').Light;
 const constant = require('../../').constants;
 const assert = require('chai').assert;
 
-suite('Light', () => {
+describe('Light', () => {
   let client;
   let bulb;
   const getMsgQueueLength = () => {
@@ -43,7 +43,8 @@ suite('Light', () => {
     hue: 0,
     saturation: 0,
     brightness: 0,
-    kelvin: 2500,
+    // the value was changed in constants before
+    kelvin: constant.HSBK_MINIMUM_KELVIN,
     zoneIndex: 0
   };
 
@@ -52,7 +53,7 @@ suite('Light', () => {
     hue: 360,
     saturation: 100,
     brightness: 100,
-    kelvin: 9000,
+    kelvin: constant.HSBK_MAXIMUM_KELVIN,
     zoneIndex: 255
   };
 
@@ -71,11 +72,11 @@ suite('Light', () => {
     client.destroy();
   });
 
-  test('light status \'on\' after instanciation', () => {
+  it('light status \'on\' after instanciation', () => {
     assert.equal(bulb.status, 'on');
   });
 
-  test('turning a light on', () => {
+  it('turning a light on', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
     bulb.on();
@@ -104,7 +105,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('turning a light off', () => {
+  it('turning a light off', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
 
@@ -134,7 +135,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('changing the color of a light', () => {
+  it('changing the color of a light', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
 
@@ -228,7 +229,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('changing the color of a light via rgb integer values', () => {
+  it('changing the color of a light via rgb integer values', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
 
@@ -296,7 +297,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('changing the color of a light via rgb hex values', () => {
+  it('changing the color of a light via rgb hex values', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
 
@@ -329,7 +330,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('changing infrared maximum brightness', () => {
+  it('changing infrared maximum brightness', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
 
@@ -365,7 +366,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting light summary', () => {
+  it('getting light summary', () => {
     assert.throw(() => {
       bulb.getState('test');
     }, TypeError);
@@ -376,7 +377,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting hardware', () => {
+  it('getting hardware', () => {
     assert.throw(() => {
       bulb.getHardwareVersion('test');
     }, TypeError);
@@ -387,7 +388,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting firmware version', () => {
+  it('getting firmware version', () => {
     assert.throw(() => {
       bulb.getFirmwareVersion('test');
     }, TypeError);
@@ -398,7 +399,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting firmware info', () => {
+  it('getting firmware info', () => {
     assert.throw(() => {
       bulb.getFirmwareInfo('test');
     }, TypeError);
@@ -409,7 +410,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting wifi info', () => {
+  it('getting wifi info', () => {
     assert.throw(() => {
       bulb.getWifiInfo('test');
     }, TypeError);
@@ -420,7 +421,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting wifi version', () => {
+  it('getting wifi version', () => {
     assert.throw(() => {
       bulb.getWifiVersion('test');
     }, TypeError);
@@ -431,7 +432,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting the label', (done) => {
+  it('getting the label', (done) => {
     assert.throw(() => {
       bulb.getLabel('test');
     }, TypeError, 'expects callback to be a function');
@@ -460,7 +461,7 @@ suite('Light', () => {
     assert.equal(getMsgHandlerLength(), currHandlerCnt, 'does not add a handler if cache availible');
   });
 
-  test('setting the label', () => {
+  it('setting the label', () => {
     let currMsgQueCnt = getMsgQueueLength();
     let currHandlerCnt = getMsgHandlerLength();
     assert.throw(() => {
@@ -500,7 +501,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting ambient light', () => {
+  it('getting ambient light', () => {
     assert.throw(() => {
       bulb.getAmbientLight('someValue');
     }, TypeError);
@@ -511,7 +512,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting power', () => {
+  it('getting power', () => {
     assert.throw(() => {
       bulb.getPower('someValue');
     }, TypeError);
@@ -522,7 +523,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting infrared', () => {
+  it('getting infrared', () => {
     assert.throw(() => {
       bulb.getMaxIR('someValue');
     }, TypeError);
@@ -533,7 +534,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('getting color zones', () => {
+  it('getting color zones', () => {
     // No arguments
     assert.throw(() => {
       bulb.getColorZones();
@@ -565,7 +566,7 @@ suite('Light', () => {
     currHandlerCnt += 1;
   });
 
-  test('changing the color of light zones', () => {
+  it('changing the color of light zones', () => {
     // No arguments or too few arguments
     assert.throw(() => bulb.colorZones(), TypeError);
     assert.throw(() => bulb.colorZones(valid.zoneIndex, valid.zoneIndex), TypeError);

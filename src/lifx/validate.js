@@ -82,8 +82,8 @@ validate.irBrightness = function(brightness, context) {
  * @param {String} context validation context
  */
 validate.optionalKelvin = function(kelvin, context) {
-  const message = 'LIFX %s expects kelvin to be a number between 2500 and 9000';
   if (kelvin !== undefined) {
+    const message = `LIFX %s expects kelvin to be a number between ${constants.HSBK_MINIMUM_KELVIN} and ${constants.HSBK_MAXIMUM_KELVIN}`;
     if (typeof kelvin !== 'number') {
       throwTypeError(message, context);
     } else if (kelvin < constants.HSBK_MINIMUM_KELVIN || kelvin > constants.HSBK_MAXIMUM_KELVIN) {
@@ -156,6 +156,7 @@ validate.zoneIndex = function(index, context) {
  * Checks validity of an optional light zone index
  * @param {any} index Light zone index to validate
  * @param {String} context validation context
+ * @return {Boolean} const true or an exception
  */
 validate.optionalZoneIndex = function(index, context) {
   const zoneMessage = 'LIFX %s expects zone to be a number between ' +
@@ -167,6 +168,54 @@ validate.optionalZoneIndex = function(index, context) {
       throwRangeError(zoneMessage, context);
     }
   }
+  return true;
+};
+
+/**
+ * test if the given value is an uint value
+ * @param {Number} val the given uint value as number
+ * @param {String} context the string for the error message
+ * @param {Number} range the range of the uint value
+ * @return {Boolean} const true or an exception
+ */
+validate.isUIntRange = function(val, context, range) {
+  if (typeof val !== 'number') {
+    throwTypeError('LIFX %s expects "%s" to be a number', context, val);
+  }
+  if (!(val >= 0 && val <= range)) {
+    throw new RangeError(`LIFX ${context} expects "${val}" to be a number between 0 and ${range}`);
+  }
+  return true;
+};
+
+/**
+ * test if the given value is an uint8 value
+ * @param {Number} val the given uint8 value as number
+ * @param {String} context the string for the error message
+ * @return {Boolean} const true or an exception
+ */
+validate.isUInt8 = function(val, context) {
+  return validate.isUIntRange(val, context, 0xff);
+};
+
+/**
+ * test if the given value is an uint16 value
+ * @param {Number} val the given uint16 value as number
+ * @param {String} context the string for the error message
+ * @return {Boolean} const true or an exception
+ */
+validate.isUInt16 = function(val, context) {
+  return validate.isUIntRange(val, context, 0xffff);
+};
+
+/**
+ * test if the given value is an uint32 value
+ * @param {Number} val the given uint32 value as number
+ * @param {String} context the string for the error message
+ * @return {Boolean} const true or an exception
+ */
+validate.isUInt32 = function(val, context) {
+  return validate.isUIntRange(val, context, 0xffffffff);
 };
 
 /**

@@ -83,6 +83,67 @@ utils.isIpv4Format = function(ip) {
 };
 
 /**
+ * set any val to a number by the given default
+ * @param {any} val given value
+ * @param {Number} def given default
+ * @return {Number} the 16bit number
+ */
+utils.to16Bitnumber = function(val, def) {
+  if (typeof val !== 'number') {
+    if (typeof def === 'number') {
+      val = def;
+    } else {
+      val = 0;
+    }
+  }
+  if (val < 0) {
+    val = (-1 * val) + 0x10000;
+  }
+  return val & 0xffff;
+};
+
+/**
+ * Checks validity of color to be an HSBK Value
+ * This updates HSBK to defaults
+ * @param {Object} color value
+ * @param {Number} color.hue value
+ * @param {Number} color.saturation value
+ * @param {Number} color.brightness value
+ * @param {Number} color.kelvin value
+ * @return {Object} HSBK value
+ */
+utils.toColorHsbk = function(color) {
+  if (typeof color !== 'object') {
+    throw new TypeError('LIFX util toColorHsbk expects colors to be an object');
+  }
+  return {
+    hue: utils.to16Bitnumber(color.hue, 0x8000),
+    saturation: utils.to16Bitnumber(color.saturation, 0x8000),
+    brightness: utils.to16Bitnumber(color.brightness, 0x8000),
+    kelvin: utils.to16Bitnumber(color.kelvin, constants.HSBK_DEFAULT_KELVIN)
+  };
+};
+
+/**
+ * Checks validity of colors array containing HSBK
+ * This updates HSBK values to defaults
+ * @param {array} colors of HSBK values
+ * @param {Number} size if set array has to have size
+ * @return {array} colors array by the given size
+ */
+utils.buildColorsHsbk = function(colors, size) {
+  if (!Array.isArray(colors)) {
+    throw new TypeError('LIFX util buildColorsHsbk expects colors to be an array');
+  }
+  if (typeof size !== 'number') {
+    size = 0;
+  }
+  return (new Array(size))
+    .fill(undefined)
+    .map((_, idx) => this.toColorHsbk(colors[idx] || {}));
+};
+
+/**
  * Converts an RGB Hex string to an object with decimal representations
  * @example rgbHexStringToObject('#FF00FF')
  * @param {String} rgbHexString hex value to parse, with leading #
@@ -125,20 +186,22 @@ utils.rgbHexStringToObject = function(rgbHexString) {
   };
 };
 
+/**
+ * find mininum number in an array
+ * @param {Array} array of numbers
+ * @return {Number} minium of the given array
+ */
 utils.minNumberInArray = function(array) {
-  const sortedCopy = array.slice();
-  sortedCopy.sort(function(a, b) {
-    return a - b;
-  });
-  return sortedCopy[0];
+  return Math.min(...array);
 };
 
+/**
+ * find maxinum number in an array
+ * @param {Array} array of numbers
+ * @return {Number} maxinum of the given array
+ */
 utils.maxNumberInArray = function(array) {
-  const sortedCopy = array.slice();
-  sortedCopy.sort(function(a, b) {
-    return a - b;
-  });
-  return sortedCopy[sortedCopy.length - 1];
+  return Math.max(...array);
 };
 
 /**

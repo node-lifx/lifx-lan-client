@@ -8,7 +8,7 @@ const assert = require('chai').assert;
 const lolex = require('lolex');
 const sinon = require('sinon');
 
-suite('Client', () => {
+describe('Client', () => {
   let client;
   let clock;
   const getMsgQueueLength = (queueAddress) => {
@@ -35,11 +35,11 @@ suite('Client', () => {
     client.destroy();
   });
 
-  test('not connected by default', () => {
+  it('not connected by default', () => {
     assert.isNull(client.address());
   });
 
-  test('connected after init', (done) => {
+  it('connected after init', (done) => {
     client.init({}, () => {
       assert.isObject(client.address());
       assert.property(client.address(), 'address');
@@ -48,7 +48,7 @@ suite('Client', () => {
     });
   });
 
-  test('accepts init parameters', (done) => {
+  it('accepts init parameters', (done) => {
     client.init({
       address: '127.0.0.1',
       port: 65535,
@@ -77,7 +77,7 @@ suite('Client', () => {
     });
   });
 
-  test('init parameters of wrong types throw exception', () => {
+  it('init parameters of wrong types throw exception', () => {
     assert.throw(() => {
       client.init({port: '57500'});
     }, TypeError);
@@ -155,7 +155,7 @@ suite('Client', () => {
     }, RangeError);
   });
 
-  test('inits with random bind port by default', (done) => {
+  it('inits with random bind port by default', (done) => {
     client.init({
       startDiscovery: false
     }, () => {
@@ -169,7 +169,7 @@ suite('Client', () => {
     });
   });
 
-  test('inits with random source by default', (done) => {
+  it('inits with random source by default', (done) => {
     client.init({
       startDiscovery: false
     }, () => {
@@ -179,7 +179,7 @@ suite('Client', () => {
     });
   });
 
-  test('discovery start and stop', (done) => {
+  it('discovery start and stop', (done) => {
     client.init({
       startDiscovery: false
     }, () => {
@@ -192,7 +192,7 @@ suite('Client', () => {
     });
   });
 
-  test('discovery packet processing', () => {
+  it('discovery packet processing', () => {
     const discoveryMessage = {
       size: 41,
       addressable: true,
@@ -241,7 +241,7 @@ suite('Client', () => {
     assert.equal(currMsgQueCnt, getMsgQueueLength(queueAddress), 'no new messages');
   });
 
-  test('finding bulbs by different parameters', () => {
+  it('finding bulbs by different parameters', () => {
     const bulbs = [];
     let bulb;
 
@@ -332,7 +332,7 @@ suite('Client', () => {
     }, TypeError);
   });
 
-  test('adding packages to the sending queue', (done) => {
+  it('adding packages to the sending queue', (done) => {
     client.init({
       startDiscovery: false
     }, () => {
@@ -354,7 +354,7 @@ suite('Client', () => {
     });
   });
 
-  test('getting all known lights', () => {
+  it('getting all known lights', () => {
     const bulbs = [];
     let bulb;
 
@@ -394,7 +394,7 @@ suite('Client', () => {
     }, TypeError);
   });
 
-  test('changing debugging mode', () => {
+  it('changing debugging mode', () => {
     assert.throw(() => {
       client.setDebug('true');
     }, TypeError);
@@ -408,7 +408,7 @@ suite('Client', () => {
     assert.equal(client.debug, false);
   });
 
-  suite('message handler', () => {
+  describe('message handler', () => {
     beforeEach(() => {
       clock = lolex.install(Date.now());
     });
@@ -417,14 +417,14 @@ suite('Client', () => {
       clock.uninstall();
     });
 
-    test('discovery handler registered by default', () => {
+    it('discovery handler registered by default', () => {
       assert.lengthOf(client.messageHandlers, 3);
       assert.equal(client.messageHandlers[0].type, 'stateService');
       assert.equal(client.messageHandlers[1].type, 'stateLabel');
       assert.equal(client.messageHandlers[2].type, 'stateLight');
     });
 
-    test('adding valid handlers', () => {
+    it('adding valid handlers', () => {
       const prevMsgHandlerCount = client.messageHandlers.length;
       client.addMessageHandler('stateLight', () => {}, 1);
       assert.lengthOf(client.messageHandlers, prevMsgHandlerCount + 1, 'message handler has been added');
@@ -432,7 +432,7 @@ suite('Client', () => {
       assert.equal(client.messageHandlers[prevMsgHandlerCount].timestamp / 1000, Date.now() / 1000, 'timestamp set to now');
     });
 
-    test('adding invalid handlers', () => {
+    it('adding invalid handlers', () => {
       assert.throw(() => {
         client.addMessageHandler('stateLight', () => {}, '1');
       }, TypeError);
@@ -447,7 +447,7 @@ suite('Client', () => {
       }, RangeError);
     });
 
-    test('calling and removing one time handlers after call', (done) => {
+    it('calling and removing one time handlers after call', (done) => {
       let mustBeFalse = false;
       const prevMsgHandlerCount = client.messageHandlers.length;
 
@@ -475,7 +475,7 @@ suite('Client', () => {
       }, {});
     });
 
-    test('keeping permanent handlers after call', (done) => {
+    it('keeping permanent handlers after call', (done) => {
       const prevMsgHandlerCount = client.messageHandlers.length;
       client.addMessageHandler('statePower', (err, msg, rinfo) => {
         assert.isNull(err, 'no error');
@@ -491,7 +491,7 @@ suite('Client', () => {
       assert.lengthOf(client.messageHandlers, prevMsgHandlerCount + 1, 'handler is still present');
     });
 
-    test('calling and removing packets with sequenceNumber, after messageHandlerTimeout', (done) => {
+    it('calling and removing packets with sequenceNumber, after messageHandlerTimeout', (done) => {
       const prevMsgHandlerCount = client.messageHandlers.length;
       const messageHandlerTimeout = 30000; // Our timeout for the test
 
@@ -530,7 +530,7 @@ suite('Client', () => {
     });
   });
 
-  suite('sending process', () => {
+  describe('sending process', () => {
     beforeEach(() => {
       clock = lolex.install(Date.now());
     });
@@ -539,7 +539,7 @@ suite('Client', () => {
       clock.uninstall();
     });
 
-    test('with no meesages in queue', (done) => {
+    it('with no meesages in queue', (done) => {
       const shouldNotBeCalled = () => {
         throw new Error();
       };
@@ -556,7 +556,7 @@ suite('Client', () => {
       });
     });
 
-    test('with new single one way packet in queue', (done) => {
+    it('with new single one way packet in queue', (done) => {
       const packetSendCallback = (msg, rinfo) => {
         if (msg === undefined || rinfo === undefined) {
           throw new Error();
@@ -586,7 +586,7 @@ suite('Client', () => {
       });
     });
 
-    test('with a new request and response packet in queue', (done) => {
+    it('with a new request and response packet in queue', (done) => {
       const packetSendCallback = (msg, rinfo) => {
         if (msg === undefined || rinfo === undefined) {
           throw new Error();
@@ -616,7 +616,7 @@ suite('Client', () => {
       });
     });
 
-    test('with a max retried request and response packet in queue', (done) => {
+    it('with a max retried request and response packet in queue', (done) => {
       const shouldNotBeSendCallback = () => {
         throw new Error();
       };
@@ -650,7 +650,7 @@ suite('Client', () => {
       });
     });
 
-    test('stops discovery after predefined lights found when stopAfterDiscovery is true', (done) => {
+    it('stops discovery after predefined lights found when stopAfterDiscovery is true', (done) => {
       const discoveryMessage = {
         size: 41,
         addressable: true,
