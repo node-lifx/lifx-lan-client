@@ -60,7 +60,9 @@ describe('Client', () => {
       lights: ['192.168.0.100'],
       broadcast: '192.168.0.255',
       sendPort: 65534,
-      stopAfterDiscovery: true
+      stopAfterDiscovery: true,
+      discoveryInterval: 2000,
+      messageRateLimit: 30
     }, () => {
       assert.equal(client.address().address, '127.0.0.1');
       assert.equal(client.address().port, 65535);
@@ -72,6 +74,8 @@ describe('Client', () => {
       assert.equal(client.broadcastAddress, '192.168.0.255');
       assert.equal(client.sendPort, 65534);
       assert.equal(client.stopAfterDiscovery, true);
+      assert.equal(client.discoveryInterval, 2000);
+      assert.equal(client.messageRateLimit, 30);
       assert.deepEqual(client.lightAddresses, ['192.168.0.100']);
       done();
     });
@@ -153,6 +157,22 @@ describe('Client', () => {
     assert.throw(() => {
       client.init({sendPort: 65536});
     }, RangeError);
+
+    assert.throw(() => {
+      client.init({messageRateLimit: '5'});
+    }, TypeError);
+
+    assert.throw(() => {
+      client.init({messageRateLimit: 0});
+    }, RangeError);
+
+    assert.throw(() => {
+      client.init({discoveryInterval: 0});
+    }, RangeError);
+
+    assert.throw(() => {
+      client.init({discoveryInterval: '500'});
+    }, TypeError);
   });
 
   it('inits with random bind port by default', (done) => {
