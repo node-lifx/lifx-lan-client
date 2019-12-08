@@ -68,8 +68,8 @@ util.inherits(Client, EventEmitter);
  * @param {Boolean} [options.stopAfterDiscovery] Stop discovery after discovering known addressable lights defined with options.light
  * @param {String} [options.broadcast] The broadcast address to use for light discovery
  * @param {Number} [options.sendPort] The port to send messages to
- * @param {Number} [options.messageRateLimit] Interval in ms with which messages will be sent
- * @param {Number} [options.discoveryInterval] Interval in ms between discovery operations
+ * @param {Number} [options.messageRateLimit] The minimum delay (in ms) between sending any two packets to a single light
+ * @param {Number} [options.discoveryInterval] Interval (in ms) between discovery operations
  * @param {Function} [callback] Called after initialation
  */
 Client.prototype.init = function(options, callback) {
