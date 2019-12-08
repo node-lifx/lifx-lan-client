@@ -23,7 +23,9 @@ function Client() {
   this.port = null;
   this.messageQueues = {};
   this.sendTimers = {};
+  this.messageRateLimit = 50; // ms
   this.discoveryTimer = null;
+  this.discoveryInterval = 5000; // ms
   this.discoveryPacketSequence = 0;
   this.messageHandlers = [{
     type: 'stateService',
@@ -66,6 +68,8 @@ util.inherits(Client, EventEmitter);
  * @param {Boolean} [options.stopAfterDiscovery] Stop discovery after discovering known addressable lights defined with options.light
  * @param {String} [options.broadcast] The broadcast address to use for light discovery
  * @param {Number} [options.sendPort] The port to send messages to
+ * @param {Number} [options.messageRateLimit] Interval in ms with which messages will be sent
+ * @param {Number} [options.discoveryInterval] Interval in ms between discovery operations
  * @param {Function} [callback] Called after initialation
  */
 Client.prototype.init = function(options, callback) {
@@ -82,7 +86,9 @@ Client.prototype.init = function(options, callback) {
     broadcast: '255.255.255.255',
     sendPort: constants.LIFX_DEFAULT_PORT,
     resendPacketDelay: 150,
-    resendMaxTimes: 3
+    resendMaxTimes: 3,
+    messageRateLimit: 50,
+    discoveryInterval: 5000
   };
 
   options = options || {};
@@ -161,6 +167,20 @@ Client.prototype.init = function(options, callback) {
       throw new TypeError('LIFX Client source option must be given as string');
     }
   }
+
+  if (typeof opts.messageRateLimit !== 'number') {
+    throw new TypeError('LIFX Client messageRateLimit option must be a number');
+  } else if (opts.messageRateLimit <= 0) {
+    throw new RangeError('LIFX Client messageRateLimit option must greater than 0');
+  }
+  this.messageRateLimit = opts.messageRateLimit;
+
+  if (typeof opts.discoveryInterval !== 'number') {
+    throw new TypeError('LIFX Client discoveryInterval option must be a number');
+  } else if (opts.discoveryInterval <= 0) {
+    throw new RangeError('LIFX Client discoveryInterval option must greater than 0');
+  }
+  this.discoveryInterval = opts.discoveryInterval;
 
   this.socket.on('error', function(err) {
     this.isSocketBound = false;
@@ -309,7 +329,7 @@ Client.prototype.sendingProcess = function(queueAddress) {
 Client.prototype.startSendingProcess = function(queueAddress = this.broadcastAddress) {
   if (isNil(this.sendTimers[queueAddress])) { // Already running?
     const sendingProcess = this.sendingProcess(queueAddress);
-    this.sendTimers[queueAddress] = setInterval(sendingProcess, constants.MESSAGE_RATE_LIMIT);
+    this.sendTimers[queueAddress] = setInterval(sendingProcess, this.messageRateLimit);
   }
 };
 
@@ -365,7 +385,7 @@ Client.prototype.startDiscovery = function(lights) {
 
   this.discoveryTimer = setInterval(
     sendDiscoveryPacket,
-    constants.DISCOVERY_INTERVAL
+    this.discoveryInterval
   );
 
   sendDiscoveryPacket();
