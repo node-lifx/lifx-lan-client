@@ -354,7 +354,6 @@ export const constants: {
       saturation: number;
     };
   };
-  DISCOVERY_INTERVAL: number;
   HSBK_DEFAULT_KELVIN: number;
   HSBK_MAXIMUM_BRIGHTNESS: number;
   HSBK_MAXIMUM_HUE: number;
@@ -377,7 +376,6 @@ export const constants: {
     name: string;
   }[];
   LIGHT_WAVEFORMS: string[];
-  MESSAGE_RATE_LIMIT: number;
   ORIGIN_BITS: number;
   PACKET_HEADER_SEQUENCE_MAX: number;
   PACKET_HEADER_SIZE: number;

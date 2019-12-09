@@ -408,7 +408,9 @@ client.init({
   broadcast: '255.255.255.255', // set's the IPv4 broadcast address which is addressed to discover bulbs
   lights: [], // Can be used provide a list of known light IPv4 ip addresses if broadcast packets in network are not allowed
               // For example: ['192.168.0.112', '192.168.0.114'], this will then be addressed directly
-  stopAfterDiscovery: false // stops discovery process after discovering all known lights (requires list
-                            // of addresses provided with "lights" setting)
+  stopAfterDiscovery: false, // stops discovery process after discovering all known lights (requires list
+                             // of addresses provided with "lights" setting)
+  discoveryInterval: 5000, // Interval (in ms) between discovery operations
+  messageRateLimit: 50, // The delay (in ms) between sending any two packets to a single light
 });
 ```
