@@ -702,15 +702,8 @@ Light.prototype.getDeviceChain = function(callback) {
  * @param {Function} callback called when light did receive message
  */
 Light.prototype.setUserPosition = function(tileIndex, userX, userY, reserved, callback) {
-  if (tileIndex === undefined || typeof tileIndex !== 'number') {
-    throw new TypeError('LIFX light setUserPosition tileIndex to be a number');
-  }
-  if (userX === undefined || typeof userX !== 'number') {
-    throw new TypeError('LIFX light setUserPosition userX to be a number');
-  }
-  if (userY === undefined || typeof userY !== 'number') {
-    throw new TypeError('LIFX light setUserPosition userY to be a number');
-  }
+  validate.isUint8(tileIndex, 'setUserPosition', 'tileIndex');
+  validate.isXY(userX, userY, 'setUserPosition', 'user');
   validate.optionalCallback(callback, 'light setUserPosition method');
 
   const packetObj = packet.create('setUserPositiion', {
@@ -723,6 +716,33 @@ Light.prototype.setUserPosition = function(tileIndex, userX, userY, reserved, ca
   this.client.send(packetObj, callback);
 };
 
+function defaultOptionsTileState64(options) {
+  const ret = {
+    length: options.length,
+    x: options.x,
+    y: options.y,
+    width: options.width,
+    reserved: options.reserved,
+    duration: options.duration
+  };
+  if (typeof ret.length !== 'number') {
+    ret.length = 64;
+  }
+  if (typeof ret.width !== 'number') {
+    ret.length = 8;
+  }
+  if (typeof ret.x !== 'number') {
+    ret.x = 0;
+  }
+  if (typeof ret.y !== 'number') {
+    ret.y = 0;
+  }
+  if (typeof ret.duration !== 'number') {
+    ret.duration = 8;
+  }
+  return ret;
+}
+
 /**
  * Requests tile GetTileState64 707
  *
@@ -732,34 +752,23 @@ Light.prototype.setUserPosition = function(tileIndex, userX, userY, reserved, ca
  * and length is used to get the state of that many tiles beginning
  * from the tileIndex. This will result in a separate response from
  * each tile.
- * For the LIFX Tile it really only makes sense to set x and y to
- * zero, and width to 8.
  * @param {Number} tileIndex	unsigned 8-bit integer
- * @param {Number} length	unsigned 8-bit integer
- * @param {Number} x	unsigned 8-bit integer
- * @param {Number} y	unsigned 8-bit integer
- * @param {Number} width	unsigned 8-bit integer
- * @param {Number} reserved	unsigned 8-bit integer
+ * @param {Object} options - options passed to
+ * @param {Number} options.length	unsigned 8-bit integer (default 64)
+ * @param {Number} options.x	unsigned 8-bit integer (default 0)
+ * @param {Number} options.y	unsigned 8-bit integer (default 0)
+ * @param {Number} options.width	unsigned 8-bit integer (default 8)
+ * @param {Number} options.reserved	unsigned 8-bit integer
  * @param {Function} callback a function to accept the data
  */
-Light.prototype.getTileState64 = function(tileIndex, length, x, y, width, reserved, callback) {
-  if (tileIndex === undefined || typeof tileIndex !== 'number') {
-    throw new TypeError('LIFX light getTileState64 tileIndex to be a number');
-  }
-  if (length === undefined || typeof length !== 'number') {
-    throw new TypeError('LIFX light getTileState64 length to be a number');
-  }
-  if (x === undefined || typeof x !== 'number') {
-    throw new TypeError('LIFX light getTileState64 x to be a number');
-  }
-  if (y === undefined || typeof y !== 'number') {
-    throw new TypeError('LIFX light getTileState64 y to be a number');
-  }
-  if (width === undefined || typeof width !== 'number') {
-    throw new TypeError('LIFX light getTileState64 width to be a number');
+Light.prototype.getTileState64 = function(tileIndex, options, callback) {
+  validate.isUint8(tileIndex, 'getTileState64', 'tileIndex');
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
   }
   validate.callback(callback, 'light getTileState64 method');
-
+  const {length, x, y, width, reserved} = defaultOptionsTileState64(options);
   const packetObj = packet.create('getTileState64', {
     tileIndex,
     length,
@@ -786,36 +795,24 @@ Light.prototype.getTileState64 = function(tileIndex, length, x, y, width, reserv
  * For the LIFX Tile it really only makes sense to set x
  * and y to zero, and width to 8.
  * @param {Number} tileIndex	unsigned 8-bit integer
- * @param {Number} length	unsigned 8-bit integer
- * @param {Number} x	unsigned 8-bit integer
- * @param {Number} y	unsigned 8-bit integer
- * @param {Number} width	unsigned 8-bit integer
- * @param {Number} duration	unsigned 32-bit integer
  * @param {Number} colors[64]	64 HSBK values
- * @param {Number} reserved	unsigned 8-bit integer
+ * @param {Object} options - options passed to
+ * @param {Number} options.length	unsigned 8-bit integer (default 0)
+ * @param {Number} options.x	unsigned 8-bit integer (default 8)
+ * @param {Number} options.y	unsigned 8-bit integer (default 8)
+ * @param {Number} options.width	unsigned 8-bit integer (default 8)
+ * @param {Number} options.duration	unsigned 32-bit integer (default 0)
+ * @param {Number} options.reserved	unsigned 8-bit integer
  * @param {Function} [callback] called when light did receive message
  */
-Light.prototype.setTileState64 = function(tileIndex, length, x, y, width, duration, colors, reserved, callback) {
-  if (tileIndex === undefined || typeof tileIndex !== 'number') {
-    throw new TypeError('LIFX light setTileState64 tileIndex to be a number');
+Light.prototype.setTileState64 = function(tileIndex, colors, options, callback) {
+  validate.isUint8(tileIndex, 'setTileState64', 'tileIndex');
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
   }
-  if (length === undefined || typeof length !== 'number') {
-    throw new TypeError('LIFX light setTileState64 length to be a number');
-  }
-  if (x === undefined || typeof x !== 'number') {
-    throw new TypeError('LIFX light setTileState64 x to be a number');
-  }
-  if (y === undefined || typeof y !== 'number') {
-    throw new TypeError('LIFX light setTileState64 y to be a number');
-  }
-  if (width === undefined || typeof width !== 'number') {
-    throw new TypeError('LIFX light setTileState64 width to be a number');
-  }
-  if (duration === undefined || typeof duration !== 'number') {
-    throw new TypeError('LIFX light setTileState64 duration to be a number');
-  }
+  const {length, x, y, width, duration, reserved} = defaultOptionsTileState64({});
   const set64colors = utils.buildColorsHsbk(colors, 64);
-
   validate.optionalCallback(callback, 'light setTileState64 method');
 
   const packetObj = packet.create('setTileState64', {

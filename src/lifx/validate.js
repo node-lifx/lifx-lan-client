@@ -203,6 +203,20 @@ validate.optionalZoneIndex = function(index, context) {
 };
 
 /**
+ * Checks validity the userX and userY
+ * @param {Number} x the x value
+ * @param {Number} y the y value
+ * @param {String} context validation context
+ * @param {String} valueName prepended to the output
+ * @return {Boolean} const true or an exception
+ */
+validate.isXY = function(x, y, context, valueName) {
+  validate.isUInt8(x, context, (valueName || '') + 'X');
+  validate.isUInt8(y, context, (valueName || '') + 'Y');
+  return true;
+};
+
+/**
  * Checks validity of a relay index
  * @param {any} index Light relay index to validate
  * @param {String} context validation context

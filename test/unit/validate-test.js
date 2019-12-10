@@ -37,4 +37,11 @@ describe('Validation', () => {
     assert.isTrue(validate.isUInt32(0xffffffff));
     assert.throw(() => validate.isUInt32(0x100000000));
   });
+
+  it('isXY', () => {
+    assert.isTrue(validate.isXY(1, 2));
+    assert.throw(() => validate.isXY());
+    assert.throw(() => validate.isXY('hallo', 4));
+    assert.throw(() => validate.isXY(4, 'hallo'));
+  });
 });
