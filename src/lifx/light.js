@@ -811,7 +811,7 @@ Light.prototype.setTileState64 = function(tileIndex, colors, options, callback) 
     callback = options;
     options = {};
   }
-  const {length, x, y, width, duration, reserved} = defaultOptionsTileState64({});
+  const {length, x, y, width, duration, reserved} = defaultOptionsTileState64(options);
   const set64colors = utils.buildColorsHsbk(colors, 64);
   validate.optionalCallback(callback, 'light setTileState64 method');
 
