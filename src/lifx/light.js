@@ -702,7 +702,7 @@ Light.prototype.getDeviceChain = function(callback) {
  * @param {Function} callback called when light did receive message
  */
 Light.prototype.setUserPosition = function(tileIndex, userX, userY, reserved, callback) {
-  validate.isUint8(tileIndex, 'setUserPosition', 'tileIndex');
+  validate.isUInt8(tileIndex, 'setUserPosition', 'tileIndex');
   validate.isXY(userX, userY, 'setUserPosition', 'user');
   validate.optionalCallback(callback, 'light setUserPosition method');
 
@@ -762,7 +762,7 @@ function defaultOptionsTileState64(options) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getTileState64 = function(tileIndex, options, callback) {
-  validate.isUint8(tileIndex, 'getTileState64', 'tileIndex');
+  validate.isUInt8(tileIndex, 'getTileState64', 'tileIndex');
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -806,7 +806,7 @@ Light.prototype.getTileState64 = function(tileIndex, options, callback) {
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.setTileState64 = function(tileIndex, colors, options, callback) {
-  validate.isUint8(tileIndex, 'setTileState64', 'tileIndex');
+  validate.isUInt8(tileIndex, 'setTileState64', 'tileIndex');
   if (typeof options === 'function') {
     callback = options;
     options = {};
