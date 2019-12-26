@@ -716,29 +716,22 @@ Light.prototype.setUserPosition = function(vals, callback) {
 };
 
 function defaultOptionsTileState64(options) {
-  const ret = {
-    length: options.length,
-    x: options.x,
-    y: options.y,
-    width: options.width,
-    reserved: options.reserved,
-    duration: options.duration
-  };
-  if (typeof ret.length !== 'number') {
-    ret.length = 64;
-  }
-  if (typeof ret.width !== 'number') {
-    ret.width = 8;
-  }
-  if (typeof ret.x !== 'number') {
-    ret.x = 0;
-  }
-  if (typeof ret.y !== 'number') {
-    ret.y = 0;
-  }
-  if (typeof ret.duration !== 'number') {
-    ret.duration = 0;
-  }
+  const ret = Object.assign({
+    tileIndex: 0,
+    length: 64,
+    width: 8,
+    x: 0,
+    y: 0,
+    duration: 0,
+    reserved: 0
+  }, options);
+  validate.isUInt8(ret.tileIndex, 'TileState64:tileIndex');
+  validate.isUInt8(ret.length, 'TileState64:length');
+  validate.isUInt8(ret.width, 'TileState64:width');
+  validate.isUInt8(ret.x, 'TileState64:x');
+  validate.isUInt8(ret.y, 'TileState64:y');
+  validate.isUInt32(ret.duration, 'TileState64:duration');
+  validate.isUInt8(ret.reserved, 'TileState64:length');
   return ret;
 }
 
@@ -752,40 +745,22 @@ function defaultOptionsTileState64(options) {
  * from the tileIndex. This will result in a separate response from
  * each tile.
  * @param {Number} tileIndex	unsigned 8-bit integer
- * @param {Object} options - options passed to
- * @param {Number} options.length	unsigned 8-bit integer (default 64)
- * @param {Number} options.x	unsigned 8-bit integer (default 0)
- * @param {Number} options.y	unsigned 8-bit integer (default 0)
- * @param {Number} options.width	unsigned 8-bit integer (default 8)
- * @param {Number} options.reserved	unsigned 8-bit integer
+ * @param {GetTileState64} optionsOrCallback - tileState ignore tileIndex
  * @param {Function} callback a function to accept the data
  */
-Light.prototype.getTileState64 = function(tileIndex, options, callback) {
-  validate.isUInt8(tileIndex, 'getTileState64', 'tileIndex');
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
+Light.prototype.getTileState64 = function(tileIndex, optionsOrCallback, callback) {
+  const options = {tileIndex};
+  if (typeof optionsOrCallback === 'function') {
+    callback = optionsOrCallback;
+  } else {
+    Object.assign(options, optionsOrCallback);
   }
   validate.callback(callback, 'light getTileState64 method');
-  const {length, x, y, width, reserved} = defaultOptionsTileState64(options);
-  const packetObj = packet.create('getTileState64', {
-    tileIndex,
-    length,
-    reserved: reserved || 0,
-    x,
-    y,
-    width
-  },
-  this.client.source
-  );
+  const packetObj = packet.create('getTileState64',
+    defaultOptionsTileState64(options), this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler('stateTileState64', function(err, msg) {
-    if (err) {
-      return callback(err, null);
-    }
-    return callback(null, msg);
-  }, sqnNumber);
+  this.client.addMessageHandler('stateTileState64', callback, sqnNumber);
 };
 
 /**
@@ -795,35 +770,25 @@ Light.prototype.getTileState64 = function(tileIndex, options, callback) {
  * and y to zero, and width to 8.
  * @param {Number} tileIndex	unsigned 8-bit integer
  * @param {Number} colors[64]	64 HSBK values
- * @param {Object} options - options passed to
- * @param {Number} options.length	unsigned 8-bit integer (default 0)
- * @param {Number} options.x	unsigned 8-bit integer (default 8)
- * @param {Number} options.y	unsigned 8-bit integer (default 8)
- * @param {Number} options.width	unsigned 8-bit integer (default 8)
- * @param {Number} options.duration	unsigned 32-bit integer (default 0)
- * @param {Number} options.reserved	unsigned 8-bit integer
+ * @param {GetTileState64} optionsOrCallback - tileState ignore tileIndex
  * @param {Function} [callback] called when light did receive message
  */
-Light.prototype.setTileState64 = function(tileIndex, colors, options, callback) {
+Light.prototype.setTileState64 = function(tileIndex, colors, optionsOrCallback, callback) {
   validate.isUInt8(tileIndex, 'setTileState64', 'tileIndex');
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
+  const options = {tileIndex};
+  if (typeof optionsOrCallback === 'function') {
+    callback = optionsOrCallback;
+  } else {
+    Object.assign(options, optionsOrCallback);
   }
-  const {length, x, y, width, duration, reserved} = defaultOptionsTileState64(options);
-  const set64colors = utils.buildColorsHsbk(colors, 64);
   validate.optionalCallback(callback, 'light setTileState64 method');
-
-  const packetObj = packet.create('setTileState64', {
-    tileIndex,
-    length,
-    reserved: reserved || 0,
-    x,
-    y,
-    width,
-    duration,
-    colors: set64colors
-  }, this.client.source);
+  if (typeof callback !== 'function') {
+    callback = () => {};
+  }
+  const packetObj = packet.create('setTileState64',
+    Object.assign(defaultOptionsTileState64(options), {
+      colors: utils.buildColorsHsbk(colors, 64)
+    }), this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
