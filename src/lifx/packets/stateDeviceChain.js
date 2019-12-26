@@ -1,59 +1,24 @@
 'use strict';
 
+const Tile = require('./tile');
+const {validate} = require('../../lifx');
+
 const Packet = {
-  size: 882,
-  Tile: {
-    toObject: function(buf, offset) {
-      const tile = {};
-      tile.accelMeasX = buf.readUInt16LE(offset);
-      offset += 2;
-      tile.accelMeasY = buf.readUInt16LE(offset);
-      offset += 2;
-      tile.accelMeasZ = buf.readUInt16LE(offset);
-      offset += 2;
-      tile.reserved0 = buf.readUInt16LE(offset);
-      offset += 2;
-      tile.userX = buf.readUInt32LE(offset);
-      offset += 4;
-      tile.userY = buf.readUInt32LE(offset);
-      offset += 4;
-      tile.width = buf.readUInt8(offset);
-      offset += 1;
-      tile.height = buf.readUInt8(offset);
-      offset += 1;
-      tile.reserved1 = buf.readUInt8(offset);
-      offset += 1;
-      tile.deviceVersionVendor = buf.readUInt32LE(offset);
-      offset += 4;
-      tile.deviceVersionProduct = buf.readUInt32LE(offset);
-      offset += 4;
-      tile.deviceVersionVersion = buf.readUInt32LE(offset);
-      offset += 4;
-      tile.firmwareBuild = {
-        low: buf.readUInt32LE(offset),
-        high: buf.readUInt32LE(offset + 4)
-      };
-      offset += 8;
-      tile.reserved2 = {
-        low: buf.readUInt32LE(offset),
-        high: buf.readUInt32LE(offset + 4)
-      };
-      offset += 8;
-      tile.firmwareVersionMinor = buf.readUInt16LE(offset);
-      offset += 2;
-      tile.firmwareVersionMajor = buf.readUInt16LE(offset);
-      offset += 2;
-      tile.reserved3 = buf.readUInt32LE(offset);
-      offset += 4;
-      return {offset, tile};
-    }
-  }
+  size: 2 + (Tile.size * 16),
+  Tile
 };
+
+/**
+ * @typedef {Object} StateDeviceChain
+ * @property {Number} startIndex - UInt8 startIndex
+ * @property {Number} totalCount - UInt8 totalCount
+ * @property {Tile[]} tileDevices- Array of Tiles
+ */
 
 /**
  * Converts packet specific data from a buffer to an object
  * @param  {Buffer} buf Buffer containing only packet specific data no header
- * @return {Object}     Information contained in packet
+ * @return {StateDeviceChain}     Information contained in packet
  */
 Packet.toObject = function(buf) {
   if (buf.length !== this.size) {
@@ -62,15 +27,35 @@ Packet.toObject = function(buf) {
   let offset = 0;
   const obj = {};
   obj.startIndex = buf.readUInt8(offset);
+  obj.totalCount = Math.min(buf.readUInt8(buf.length - 1), 16);
   offset += 1;
-  obj.tileDevices = new Array(16).fill(undefined).map(() => {
+  obj.tileDevices = Array(obj.totalCount).fill(undefined).map(() => {
     const ret = Packet.Tile.toObject(buf, offset);
     offset = ret.offset;
     return ret.tile;
   });
-  obj.totalCount = buf.readUInt8(offset);
   offset += 1;
   return obj;
+};
+
+/**
+ * Converts packet specific data from a buffer to an object
+ * @param  {StateDeviceChain} obj - as Object
+ * @return {Buffer} - Buffer of the packet
+ */
+Packet.toBuffer = function(obj) {
+  const buf = Buffer.alloc(this.size);
+  buf.fill(0);
+
+  validate.isUInt8(obj.startIndex, 'stateDeviceChain:start_index');
+
+  buf.writeUInt8(obj.startIndex, 0);
+  const len = Math.min(obj.tileDevices.length, obj.totalCount || 16);
+  buf.writeUInt8(len, Packet.size - 1);
+  obj.tileDevices.slice(0, len).reduce((ofs, tile) => {
+    return Packet.Tile.toBuffer(buf, ofs, tile).offset;
+  }, 1);
+  return buf;
 };
 
 module.exports = Packet;

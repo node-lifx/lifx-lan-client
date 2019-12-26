@@ -2,8 +2,11 @@
 
 const Lifx = require('../../').Client;
 const Light = require('../../').Light;
+const packet = require('../../').packet;
 const constant = require('../../').constants;
 const assert = require('chai').assert;
+const buildTile = require('./packets/buildTile');
+const buildColors = require('./packets/buildColors');
 
 describe('Light', () => {
   let client;
@@ -63,7 +66,7 @@ describe('Light', () => {
     relayIndex: 3
   };
 
-  beforeEach(() => {
+  beforeEach((done) => {
     client = new Lifx();
     bulb = new Light({
       client: client,
@@ -72,6 +75,9 @@ describe('Light', () => {
       port: constant.LIFX_DEFAULT_PORT,
       seenOnDiscovery: 0
     });
+    client.init({
+      startDiscovery: false
+    }, done);
   });
 
   afterEach(() => {
@@ -885,5 +891,212 @@ describe('Light', () => {
     currMsgQueCnt += 1;
     assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
     currHandlerCnt += 1;
+  });
+
+  it('getDeviceChain', (done) => {
+    const ref = {
+      startIndex: 1,
+      tileDevices: Array(13).fill(0)
+        .map((_, i) => i * 103)
+        .map((i) => buildTile(i))
+    };
+    bulb.getDeviceChain((err, msg) => {
+      try {
+        assert.isFalse(Boolean(err));
+        assert.equal(msg.startIndex, ref.startIndex);
+        msg.tileDevices.forEach((tile, i) => {
+          tile.userX = ref.tileDevices[i].userX;
+          tile.userY = ref.tileDevices[i].userY;
+        });
+        assert.deepEqual(msg.tileDevices, ref.tileDevices);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    const mq = client.getMessageQueue();
+    assert.equal(36, mq[mq.length - 1].data.length);
+    assert.equal(701, mq[mq.length - 1].data.readUInt16LE(32));
+    client.socket.emit('message',
+      packet.toBuffer(packet.create('stateDeviceChain', ref, client.source)), {
+        address: '127.0.47.11'
+      });
+  });
+
+  it('setUserPosition', (done) => {
+    const ref = {
+      tileIndex: 4,
+      reserved: 0x5005,
+      userX: 6.0006,
+      userY: 7.0007
+    };
+    bulb.setUserPosition(ref, (err, msg) => {
+      try {
+        assert.isFalse(Boolean(err));
+        assert.equal(msg.type, 'acknowledgement');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    const mq = client.getMessageQueue();
+    // assert.equal(36, mq[mq.length - 1].data.length);
+    // assert.equal(706, mq[mq.length - 1].data.readUInt16LE(32));
+    const msg = packet.toObject(mq[mq.length - 1].data);
+    assert.equal(msg.type, 703);
+    assert.equal(msg.tileIndex, ref.tileIndex);
+    assert.equal(msg.reserved, ref.reserved);
+    assert.isTrue(Math.abs(msg.userX - ref.userX) < 0.0001, 'userX');
+    assert.isTrue(Math.abs(msg.userY - ref.userY) < 0.0001, 'userY');
+    client.socket.emit('message',
+      packet.toBuffer(packet.create('acknowledgement', {
+        sequence: msg.sequence
+      }, client.source)), {
+        address: '127.0.47.11'
+      });
+  });
+
+  it('getTileState64 without options', (done) => {
+    const ref = {
+      tileIndex: 4,
+      reserved: 0x0,
+      x: 0,
+      y: 0,
+      width: 8,
+      colors: buildColors()
+    };
+    bulb.getTileState64(ref.tileIndex, (err, msg) => {
+      try {
+        assert.isFalse(Boolean(err));
+        assert.deepEqual(msg.colors, ref.colors);
+        assert.equal(msg.tileIndex, ref.tileIndex);
+        assert.equal(msg.reserved, ref.reserved);
+        assert.equal(msg.x, ref.x);
+        assert.equal(msg.y, ref.y);
+        assert.equal(msg.width, ref.width);
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    const mq = client.getMessageQueue();
+    const msg = packet.toObject(mq[mq.length - 1].data);
+    assert.equal(msg.type, 707);
+    assert.equal(msg.tileIndex, ref.tileIndex);
+    assert.equal(msg.reserved, ref.reserved);
+    assert.equal(msg.x, ref.x);
+    assert.equal(msg.y, ref.y);
+    assert.equal(msg.width, ref.width);
+    client.socket.emit('message',
+      packet.toBuffer(packet.create('stateTileState64', ref, client.source)),
+      {address: '127.0.47.11'});
+  });
+
+  it('getTileState64 with options', (done) => {
+    const ref = {
+      tileIndex: 4,
+      reserved: 0x50,
+      x: 6,
+      y: 7,
+      width: 8,
+      colors: buildColors()
+    };
+    bulb.getTileState64(ref.tileIndex, ref, (err, msg) => {
+      try {
+        assert.isFalse(Boolean(err));
+        assert.deepEqual(msg.colors, ref.colors, 'colors');
+        assert.equal(msg.tileIndex, ref.tileIndex, 'tileIndex');
+        assert.equal(msg.reserved, ref.reserved, 'reserved');
+        assert.equal(msg.x, ref.x, 'x');
+        assert.equal(msg.y, ref.y, 'y');
+        assert.equal(msg.width, ref.width, 'width');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    const mq = client.getMessageQueue();
+    // assert.equal(36, mq[mq.length - 1].data.length);
+    // assert.equal(706, mq[mq.length - 1].data.readUInt16LE(32));
+    const msg = packet.toObject(mq[mq.length - 1].data);
+    assert.equal(msg.type, 707);
+    assert.equal(msg.tileIndex, ref.tileIndex);
+    assert.equal(msg.reserved, ref.reserved);
+    assert.equal(msg.x, ref.x);
+    assert.equal(msg.y, ref.y);
+    assert.equal(msg.width, ref.width);
+    client.socket.emit('message',
+      packet.toBuffer(packet.create('stateTileState64', ref, client.source)),
+      {address: '127.0.47.11'});
+  });
+
+  it('setTileState64 without options', (done) => {
+    const colors = buildColors();
+    bulb.setTileState64(1, colors, (err, msg) => {
+      try {
+        assert.isFalse(Boolean(err));
+        assert.equal(msg.type, 'acknowledgement');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    const mq = client.getMessageQueue();
+    const msg = packet.toObject(mq[mq.length - 1].data);
+    assert.equal(msg.type, 715);
+    // console.log(msg);
+    assert.equal(msg.tileIndex, 1);
+    assert.equal(msg.length, 64);
+    assert.equal(msg.reserved, 0);
+    assert.equal(msg.x, 0);
+    assert.equal(msg.y, 0);
+    assert.equal(msg.width, 8, 'width');
+    assert.equal(msg.duration, 0, 'duration');
+    assert.deepEqual(msg.colors, colors);
+    client.socket.emit('message',
+      packet.toBuffer(packet.create('acknowledgement', {
+        sequence: msg.sequence
+      }, client.source)), {
+        address: '127.0.47.11'
+      });
+  });
+
+  it('setTileState64 with options', (done) => {
+    const ref = {
+      reserved: 0x50,
+      x: 6,
+      y: 7,
+      width: 8,
+      duration: 0x9009
+    };
+    const colors = buildColors();
+
+    bulb.setTileState64(4, colors, ref, (err, msg) => {
+      try {
+        assert.isFalse(Boolean(err));
+        assert.equal(msg.type, 'acknowledgement');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+    const mq = client.getMessageQueue();
+    const msg = packet.toObject(mq[mq.length - 1].data);
+    assert.equal(msg.type, 715);
+    // console.log(msg);
+    assert.equal(msg.tileIndex, 4);
+    assert.equal(msg.length, 64);
+    assert.equal(msg.reserved, 0x50);
+    assert.equal(msg.x, 6);
+    assert.equal(msg.y, 7);
+    assert.equal(msg.width, 8, 'width');
+    assert.equal(msg.duration, 0x9009, 'duration');
+    assert.deepEqual(msg.colors, colors);
+    client.socket.emit('message',
+      packet.toBuffer(packet.create('acknowledgement', {
+        sequence: msg.sequence
+      }, client.source)), {
+        address: '127.0.47.11'
+      });
   });
 });

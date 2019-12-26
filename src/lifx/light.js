@@ -694,24 +694,23 @@ Light.prototype.getDeviceChain = function(callback) {
 
 /**
  * Sets Tile Position
- * @example light.setUserPosition(0, 12, 13, 0, () => {})
- * @param {Number} tileIndex	unsigned 8-bit integer
- * @param {Number} userX	32-bit float
- * @param {Number} userY	32-bit float
- * @param {Number} reserved	16-bit integer
+ * @param {SetUserPosition} vals - value to set
  * @param {Function} callback called when light did receive message
  */
-Light.prototype.setUserPosition = function(tileIndex, userX, userY, reserved, callback) {
-  validate.isUInt8(tileIndex, 'setUserPosition', 'tileIndex');
-  validate.isXY(userX, userY, 'setUserPosition', 'user');
+Light.prototype.setUserPosition = function(vals, callback) {
+  vals = Object.assign({
+    tileIndex: 0,
+    userX: 0,
+    userY: 0,
+    reserved: 0
+  }, vals);
+  validate.isUInt8(vals.tileIndex, 'setUserPosition', 'tileIndex');
+  validate.isFloat(vals.userX, 'setUserPosition', 'userX');
+  validate.isFloat(vals.userY, 'setUserPosition', 'userX');
+  validate.isUInt16(vals.reserved || 0, 'setUserPosition', 'reserved');
   validate.optionalCallback(callback, 'light setUserPosition method');
 
-  const packetObj = packet.create('setUserPositiion', {
-    tileIndex,
-    userX,
-    userY,
-    reserved: reserved || 0
-  }, this.client.source);
+  const packetObj = packet.create('setUserPosition', vals, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -729,7 +728,7 @@ function defaultOptionsTileState64(options) {
     ret.length = 64;
   }
   if (typeof ret.width !== 'number') {
-    ret.length = 8;
+    ret.width = 8;
   }
   if (typeof ret.x !== 'number') {
     ret.x = 0;
@@ -738,7 +737,7 @@ function defaultOptionsTileState64(options) {
     ret.y = 0;
   }
   if (typeof ret.duration !== 'number') {
-    ret.duration = 8;
+    ret.duration = 0;
   }
   return ret;
 }

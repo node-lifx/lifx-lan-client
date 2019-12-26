@@ -1,55 +1,71 @@
 'use strict';
 
 const {validate} = require('../../lifx');
+const HSBK = require('./hsbk');
 
 const Packet = {
-  size: (obj) => 10 + (obj.colors.length * (8)),
-  HSBK: {
-    toBuffer: (obj, buf, offset) => {
-      validate.isUInt16(obj.hue, 'setTileState64:HSBK:hue');
-      buf.writeUInt16LE(obj.hue, offset);
-      offset += 2;
+  size: 10 + (64 * HSBK.size),
+  HSBK
+};
 
-      validate.isUInt16(obj.saturation, 'setTileState64:HSBK:saturation');
-      buf.writeUInt16LE(obj.saturation, offset);
-      offset += 2;
+/**
+ * @typedef {Object} SetTileState64
+ * @property {Number} tileIndex an 8bit value
+ * @property {Number} length an 8bit value
+ * @property {Number} reserved an 8bit value
+ * @property {Number} x an 8bit value
+ * @property {Number} y an 8bit value
+ * @property {Number} width an 8bit value
+ * @property {HSBK[]} colors an array of HSBK values
+ */
 
-      validate.isUInt16(obj.brightness, 'setTileState64:HSBK:brightness');
-      buf.writeUInt16LE(obj.brightness, offset);
-      offset += 2;
-
-      validate.isUInt16(obj.kelvin, 'setTileState64:HSBK:kelvin');
-      buf.writeUInt16LE(obj.kelvin, offset);
-      offset += 2;
-
-      return offset;
-    }
-  }
+/**
+ * Converts the given packet specific object into a packet
+ * @param  {Buffer} buf Buffer of the data
+ * @return {SetTileState64} packet
+ */
+Packet.toObject = function(buf) {
+  const obj = {};
+  let offset = 0;
+  obj.tileIndex = buf.readUInt8(offset);
+  offset += 1;
+  obj.length = buf.readUInt8(offset);
+  offset += 1;
+  obj.reserved = buf.readUInt8(offset);
+  offset += 1;
+  obj.x = buf.readUInt8(offset);
+  offset += 1;
+  obj.y = buf.readUInt8(offset);
+  offset += 1;
+  obj.width = buf.readUInt8(offset);
+  offset += 1;
+  obj.duration = buf.readUInt32LE(offset);
+  offset += 4;
+  obj.colors = Array(64).fill(undefined).map(() => {
+    const ret = Packet.HSBK.toObject(buf, offset);
+    offset = ret.offset;
+    return ret.hsbk;
+  });
+  return obj;
 };
 
 /**
  * Converts the given packet specific object into a packet
- * @param  {Object} obj object with configuration data
- * @param  {Number} obj.tileIndex 8bit value
- * @param  {Number} obj.length 8bit value
- * @param  {Number} obj.reserved 8bit value
- * @param  {Number} obj.x 8bit value
- * @param  {Number} obj.y 8bit value
- * @param  {Number} obj.width 8bit value
- * @param  {Number} obj.duration 8bit value
- * @param  {Number} [obj.duration] transition time in milliseconds
- * @param  {Array} obj.colors an array of HSBK values
+ * @param  {SetTileState64} obj object with configuration data
  * @return {Buffer} packet
  */
 Packet.toBuffer = function(obj) {
-  const buf = Buffer.alloc(Packet.size(obj));
-  buf.fill(0);
-  let offset = 0;
-
+  obj.reserved = obj.reserved || 0;
+  obj.duration = obj.duration || 0;
   ['tileIndex', 'length', 'reserved', 'x', 'y', 'width'].forEach((field) => {
     validate.isUInt8(obj[field], `setTileState64:${field}`);
   });
-  // obj.stream field has unknown function so leave it as 0
+  validate.isUInt32(obj.duration, 'setTileState64:duration');
+
+  const buf = Buffer.alloc(Packet.size);
+  buf.fill(0);
+  let offset = 0;
+
   buf.writeUInt8(obj.tileIndex, offset);
   offset += 1;
   buf.writeUInt8(obj.length, offset);
@@ -62,11 +78,10 @@ Packet.toBuffer = function(obj) {
   offset += 1;
   buf.writeUInt8(obj.width, offset);
   offset += 1;
-  validate.isUInt32(obj.duration, 'setTileState64:duration');
   buf.writeUInt32LE(obj.duration, offset);
   offset += 4;
   obj.colors.forEach((color) => {
-    offset = Packet.HSBK.toBuffer(color, buf, offset);
+    offset = Packet.HSBK.toBuffer(buf, offset, color).offset;
   });
   return buf;
 };

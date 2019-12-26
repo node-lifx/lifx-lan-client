@@ -4,7 +4,7 @@
  * Searches for new lights, if one is found it sends a setMultiZoneEffect packet
  */
 
-const LifxClient = require('../lib/lifx').Client;
+const LifxClient = require('../').Client;
 const client = new LifxClient();
 
 // Function running when packet was received by light

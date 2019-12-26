@@ -4,8 +4,8 @@ const LifxClient = require('../lib/lifx').Client;
 
 const client = new LifxClient();
 
-const LOOPTIME = 10000;
-const TILE_LABEL = '*';
+const LOOPTIME = 1000;
+const TILE_LABEL = process.argv.length > 2 ? process.argv[process.argv.length - 1] : '*';
 
 /*
  * This example should show on all tiles of
@@ -15,14 +15,17 @@ const TILE_LABEL = '*';
  * from the tiles just to test the read back function.
  * I could not compare the set values out of the reason
  * that the setvalues are usally a bit modified.
+ *
+ * EASY: You should see an updating Pattern every two second
  */
 
 function getBits(light, idx, chain) {
-  if (idx >= chain.total_count) {
+  if (idx >= chain.totalCount) {
     console.log('All Bits get');
     setTimeout(() => setBits(light, 0, chain), LOOPTIME);
     return;
   }
+  console.log('getBits', idx);
   light.getTileState64(idx, (err) => {
     if (err) {
       console.error('getTileState64:', err);
@@ -33,21 +36,23 @@ function getBits(light, idx, chain) {
 }
 
 function setBits(light, idx, chain) {
-  if (idx >= chain.total_count) {
+  if (idx >= chain.totalCount) {
     setTimeout(() => getBits(light, 0, chain), LOOPTIME);
     return;
   }
+  console.log('setBits', idx, chain.totalCount);
   const ofs = ~~(Math.random() * (65536 - (65536 / 64)));
-  light.setTileState64(idx, {duration: 100},
+  light.setTileState64(idx,
     (new Array(64)).fill(undefined).map((_, idx) => ({
       hue: (ofs + (idx * (65536 / 64))) & 0xffff,
       saturation: 50000,
       brightness: 16384,
       kelvin: 4096
-    })), () => setBits(light, idx + 1, chain));
+    })), {duration: 100}, () => setBits(light, idx + 1, chain));
 }
 
 client.on('light-new', (light) => {
+  console.log(TILE_LABEL, light.id);
   if (!(TILE_LABEL === '*' || TILE_LABEL === light.id)) {
     return;
   }
@@ -58,7 +63,9 @@ client.on('light-new', (light) => {
     if (err) {
       console.log(err);
     }
-    setBits(light, 0, chain);
+    light.on(0, () => {
+      setBits(light, 0, chain);
+    });
   });
 });
 
