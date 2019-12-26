@@ -539,12 +539,7 @@ Light.prototype.getDeviceChain = function(callback) {
   const packetObj = packet.create('getDeviceChain', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler('stateDeviceChain', function(err, msg) {
-    if (err) {
-      return callback(err, null);
-    }
-    return callback(null, msg);
-  }, sqnNumber);
+  this.client.addMessageHandler('stateDeviceChain', callback, sqnNumber);
 };
 
 /**
@@ -564,6 +559,9 @@ Light.prototype.setUserPosition = function(vals, callback) {
   validate.isFloat(vals.userY, 'setUserPosition', 'userX');
   validate.isUInt16(vals.reserved || 0, 'setUserPosition', 'reserved');
   validate.optionalCallback(callback, 'light setUserPosition method');
+  if (typeof callback !== 'function') {
+    callback = () => {};
+  }
 
   const packetObj = packet.create('setUserPosition', vals, this.client.source);
   packetObj.target = this.id;
