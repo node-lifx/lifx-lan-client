@@ -43,7 +43,7 @@ function setBits(light, idx, chain) {
   console.log('setBits', idx, chain.totalCount);
   const ofs = ~~(Math.random() * (65536 - (65536 / 64)));
   light.setTileState64(idx,
-    (new Array(64)).fill(undefined).map((_, idx) => ({
+    Array(64).fill(undefined).map((_, idx) => ({
       hue: (ofs + (idx * (65536 / 64))) & 0xffff,
       saturation: 50000,
       brightness: 16384,

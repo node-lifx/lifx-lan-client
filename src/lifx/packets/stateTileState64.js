@@ -39,7 +39,7 @@ Packet.toObject = function(buf) {
   offset += 1;
   obj.width = buf.readUInt8(offset);
   offset += 1;
-  obj.colors = new Array(64).fill(undefined).map(() => {
+  obj.colors = Array(64).fill(undefined).map(() => {
     const ret = Packet.HSBK.toObject(buf, offset);
     offset = ret.offset;
     return ret.hsbk;
