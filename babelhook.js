@@ -6,5 +6,6 @@
 require('babel-core/register')({
   // Only compile test files
   only: /-test.js$/,
-  presets: ['env']
+  presets: ['env'],
+  sourceMaps: "both"
 });

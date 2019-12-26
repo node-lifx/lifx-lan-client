@@ -1,27 +1,27 @@
 'use strict';
 
+const {validate} = require('../../lifx');
+const HSBK = require('./hsbk');
+
 const Packet = {
-  size: 517,
-  HSBK: {
-    toObject: function(buf, offset) {
-      const hsbk = {};
-      hsbk.hue = buf.readUInt16LE(offset);
-      offset += 2;
-      hsbk.saturation = buf.readUInt16LE(offset);
-      offset += 2;
-      hsbk.brightness = buf.readUInt16LE(offset);
-      offset += 2;
-      hsbk.kelvin = buf.readUInt16LE(offset);
-      offset += 2;
-      return {offset, hsbk};
-    }
-  }
+  size: 5 + (HSBK.size * 64),
+  HSBK
 };
+
+/**
+ * @typedef {Object} StateTileState64
+ * @property {Number} tileIndex an 8bit value
+ * @property {Number} reserved an 8bit value
+ * @property {Number} x an 8bit value
+ * @property {Number} y an 8bit value
+ * @property {Number} width an 8bit value
+ * @property {HSBK[]} colors an array of HSBK values
+ */
 
 /**
  * Converts packet specific data from a buffer to an object
  * @param  {Buffer} buf Buffer containing only packet specific data no header
- * @return {Object}     Information contained in packet
+ * @return {StateTileState64}     Information contained in packet
  */
 Packet.toObject = function(buf) {
   if (buf.length !== this.size) {
@@ -45,6 +45,37 @@ Packet.toObject = function(buf) {
     return ret.hsbk;
   });
   return obj;
+};
+
+/**
+ * Converts the given packet specific object into a packet
+ * @param  {StateTileState64} obj object with configuration data
+ * @return {Buffer} packet
+ */
+Packet.toBuffer = function(obj) {
+  obj.reserved = obj.reserved || 0;
+  ['tileIndex', 'reserved', 'x', 'y', 'width'].forEach((field) => {
+    validate.isUInt8(obj[field], `setTileState64:${field}`);
+  });
+
+  const buf = Buffer.alloc(Packet.size);
+  buf.fill(0);
+  let offset = 0;
+
+  buf.writeUInt8(obj.tileIndex, offset);
+  offset += 1;
+  buf.writeUInt8(obj.reserved || 0, offset);
+  offset += 1;
+  buf.writeUInt8(obj.x, offset);
+  offset += 1;
+  buf.writeUInt8(obj.y, offset);
+  offset += 1;
+  buf.writeUInt8(obj.width, offset);
+  offset += 1;
+  obj.colors.forEach((color) => {
+    offset = Packet.HSBK.toBuffer(buf, offset, color).offset;
+  });
+  return buf;
 };
 
 module.exports = Packet;

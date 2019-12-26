@@ -44,4 +44,20 @@ describe('Validation', () => {
     assert.throw(() => validate.isXY('hallo', 4));
     assert.throw(() => validate.isXY(4, 'hallo'));
   });
+
+  it('isUInt64LowHigh', () => {
+    assert.isTrue(validate.isUInt64LowHigh({
+      low: 0x10002000,
+      high: 0x20001000
+    }));
+    assert.throw(() => validate.isUInt64LowHigh());
+    assert.throw(() => validate.isUInt64LowHigh('hallo'));
+    assert.throw(() => validate.isUInt64LowHigh({ }));
+    assert.throw(() => validate.isUInt64LowHigh({
+      low: 1
+    }));
+    assert.throw(() => validate.isUInt64LowHigh({
+      high: 1
+    }));
+  });
 });

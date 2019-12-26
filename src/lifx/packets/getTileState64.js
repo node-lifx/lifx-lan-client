@@ -7,14 +7,18 @@ const Packet = {
 };
 
 /**
+ * @typedef {Object} GetTileState64
+ * @property {Number} tileIndex an 8bit value
+ * @property {Number} length an 8bit value
+ * @property {Number} reserved an 8bit value
+ * @property {Number} x an 8bit value
+ * @property {Number} y an 8bit value
+ * @property {Number} width an 8bit valu
+ */
+
+/**
  * Converts the given packet specific object into a packet
- * @param  {Object} obj object with configuration data
- * @param  {Number} obj.tileIndex an 8bit value
- * @param  {Number} obj.length an 8bit value
- * @param  {Number} obj.reserved an 8bit value
- * @param  {Number} obj.x an 8bit value
- * @param  {Number} obj.y an 8bit value
- * @param  {Number} obj.width an 8bit value
+ * @param  {GetTileState64} obj object with configuration data
  * @return {Buffer} packet
  */
 Packet.toBuffer = function(obj) {
@@ -39,6 +43,31 @@ Packet.toBuffer = function(obj) {
   offset += 1;
 
   return buf;
+};
+
+/**
+ * Converts the given packet specific object into a packet
+ * @param  {Buffer} buf object with configuration data
+ * @return {GetTileState64} packet
+ */
+Packet.toObject = function(buf) {
+  const obj = {};
+  let offset = 0;
+
+  obj.tileIndex = buf.readUInt8(offset);
+  offset += 1;
+  obj.length = buf.readUInt8(offset);
+  offset += 1;
+  obj.reserved = buf.readUInt8(offset);
+  offset += 1;
+  obj.x = buf.readUInt8(offset);
+  offset += 1;
+  obj.y = buf.readUInt8(offset);
+  offset += 1;
+  obj.width = buf.readUInt8(offset);
+  offset += 1;
+
+  return obj;
 };
 
 module.exports = Packet;
