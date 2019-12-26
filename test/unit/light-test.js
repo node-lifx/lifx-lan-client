@@ -647,8 +647,8 @@ describe('Light', () => {
       }
     });
     const mq = client.getMessageQueue();
-    assert.equal(36, mq[mq.length - 1].data.length);
-    assert.equal(701, mq[mq.length - 1].data.readUInt16LE(32));
+    const msg = packet.toObject(mq[mq.length - 1].data);
+    assert.equal(msg.type, 701);
     client.socket.emit('message',
       packet.toBuffer(packet.create('stateDeviceChain', ref, client.source)), {
         address: '127.0.47.11'
@@ -672,8 +672,6 @@ describe('Light', () => {
       }
     });
     const mq = client.getMessageQueue();
-    // assert.equal(36, mq[mq.length - 1].data.length);
-    // assert.equal(706, mq[mq.length - 1].data.readUInt16LE(32));
     const msg = packet.toObject(mq[mq.length - 1].data);
     assert.equal(msg.type, 703);
     assert.equal(msg.tileIndex, ref.tileIndex);
@@ -748,8 +746,6 @@ describe('Light', () => {
       }
     });
     const mq = client.getMessageQueue();
-    // assert.equal(36, mq[mq.length - 1].data.length);
-    // assert.equal(706, mq[mq.length - 1].data.readUInt16LE(32));
     const msg = packet.toObject(mq[mq.length - 1].data);
     assert.equal(msg.type, 707);
     assert.equal(msg.tileIndex, ref.tileIndex);
@@ -776,7 +772,6 @@ describe('Light', () => {
     const mq = client.getMessageQueue();
     const msg = packet.toObject(mq[mq.length - 1].data);
     assert.equal(msg.type, 715);
-    // console.log(msg);
     assert.equal(msg.tileIndex, 1);
     assert.equal(msg.length, 64);
     assert.equal(msg.reserved, 0);
@@ -786,9 +781,7 @@ describe('Light', () => {
     assert.equal(msg.duration, 0, 'duration');
     assert.deepEqual(msg.colors, colors);
     client.socket.emit('message',
-      packet.toBuffer(packet.create('acknowledgement', {
-        sequence: msg.sequence
-      }, client.source)), {
+      packet.toBuffer(packet.create('acknowledgement', { }, client.source)), {
         address: '127.0.47.11'
       });
   });
@@ -815,7 +808,6 @@ describe('Light', () => {
     const mq = client.getMessageQueue();
     const msg = packet.toObject(mq[mq.length - 1].data);
     assert.equal(msg.type, 715);
-    // console.log(msg);
     assert.equal(msg.tileIndex, 4);
     assert.equal(msg.length, 64);
     assert.equal(msg.reserved, 0x50);
@@ -825,9 +817,7 @@ describe('Light', () => {
     assert.equal(msg.duration, 0x9009, 'duration');
     assert.deepEqual(msg.colors, colors);
     client.socket.emit('message',
-      packet.toBuffer(packet.create('acknowledgement', {
-        sequence: msg.sequence
-      }, client.source)), {
+      packet.toBuffer(packet.create('acknowledgement', { }, client.source)), {
         address: '127.0.47.11'
       });
   });
