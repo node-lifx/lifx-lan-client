@@ -66,15 +66,15 @@ console.log('Press u to request uptime from all lights');
 console.log('Press r to reboot all lights');
 console.log('Press 0 to exit\n');
 
-const rl = readline.createInterface({
+const lineReader = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   prompt: 'lifx> '
 });
 
-rl.prompt();
+lineReader.prompt();
 
-rl.on('line', (key) => {
+lineReader.on('line', (key) => {
   if (key === '1') {
     client.lights().forEach(function(light) {
       light.on(0, function(err) {
@@ -213,5 +213,5 @@ rl.on('line', (key) => {
     client.destroy();
     process.exit(); // eslint-disable-line no-process-exit
   }
-  rl.prompt();
+  lineReader.prompt();
 });
