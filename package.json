@@ -19,11 +19,10 @@
     "codecov.io": "^0.1.6",
     "eslint": "^5.16.0",
     "istanbul": "^0.4.0",
-    "lolex": "^1.6.0",
     "mkdirp": "^0.5.1",
     "mocha": "^6.2.0",
     "rimraf": "^2.7.1",
-    "sinon": "^4.5.0"
+    "sinon": "^9.0.0"
   },
   "directories": {
     "test": "test",
