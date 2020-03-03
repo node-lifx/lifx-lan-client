@@ -5,7 +5,6 @@ const Light = require('../../').Light;
 const packet = require('../../').packet;
 const constants = require('../../').constants;
 const assert = require('chai').assert;
-const lolex = require('lolex');
 const sinon = require('sinon');
 
 describe('Client', () => {
@@ -430,7 +429,7 @@ describe('Client', () => {
 
   describe('message handler', () => {
     beforeEach(() => {
-      clock = lolex.install(Date.now());
+      clock = sinon.useFakeTimers(Date.now());
     });
 
     afterEach(() => {
@@ -552,7 +551,7 @@ describe('Client', () => {
 
   describe('sending process', () => {
     beforeEach(() => {
-      clock = lolex.install(Date.now());
+      clock = sinon.useFakeTimers(Date.now());
     });
 
     afterEach(() => {
