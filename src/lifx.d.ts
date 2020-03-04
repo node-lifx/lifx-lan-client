@@ -1,5 +1,4 @@
 export class Client {
-
   /**
   * Creates a lifx client
   * @extends EventEmitter
@@ -132,7 +131,6 @@ export class Client {
 }
 
 export class Light {
-
   /**
   * A representation of a light bulb
   * @class
@@ -262,7 +260,6 @@ export class Light {
   * @param {Function} callback a function to accept the data
   */
   getWifiInfo(callback: any): void;
-
 
   /**
   * Requests used version from the wifi controller unit of the light (wifi firmware version)
@@ -459,7 +456,7 @@ export namespace utils {
   * @param {Number} productId id of the product
   * @return {Object|Boolean} product and details vendor details or false if not found
   */
-  function getHardwareDetails(vendorId: number, productId: number): Object | boolean;
+  function getHardwareDetails(vendorId: number, productId: number): Record<string, any> | boolean;
 
   /**
   * Return all ip addresses of the machine
@@ -506,7 +503,7 @@ export namespace utils {
   * @param {String} rgbHexString hex value to parse, with leading #
   * @return {Object}             object with decimal values for r, g, b
   */
-  function rgbHexStringToObject(rgbHexString: string): Object;
+  function rgbHexStringToObject(rgbHexString: string): Record<string, any>;
 
   /**
   * Converts an object with r,g,b integer values to an
@@ -514,7 +511,7 @@ export namespace utils {
   * @param {Object} rgbObj object with r,g,b keys and values
   * @return {Object} hsbObj object with h,s,b keys and converted values
   */
-  function rgbToHsb(rgbObj: Object): Object;
+  function rgbToHsb(rgbObj: Record<string, any>): Record<string, any>;
 
   /**
   * Writes a 64-bit value provided as buffer and returns the result

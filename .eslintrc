@@ -1,6 +1,12 @@
 {
   "env": {
+    "es6": true,
     "node": true
+  },
+  "extends": "eslint:recommended",
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
   },
   "parserOptions": {
     "ecmaVersion": 2015,
@@ -155,5 +161,23 @@
     "prefer-const": 2,
     "no-var": 2,
     "arrow-parens": 2
+  },
+  "plugins": ["@typescript-eslint"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ]
+    },
+    {
+      "files": ["*.d.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/no-unused-vars": 0
+      }
     }
+  ]
 }
