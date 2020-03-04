@@ -7,7 +7,7 @@
     "url": "https://github.com/node-lifx/lifx-lan-client/issues"
   },
   "dependencies": {
-    "eventemitter3": "^2.0.3",
+    "eventemitter3": "^4.0.0",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
