@@ -5,9 +5,9 @@
  * which tells the light to pulse to red and back three times over a period of 800ms
  */
 
-const LifxClient = require('../lib/lifx').Client;
-const packet = require('../lib/lifx').packet;
-const constants = require('../lib/lifx').constants;
+const LifxClient = require('../src/lifx').Client;
+const packet = require('../src/lifx').packet;
+const constants = require('../src/lifx').constants;
 const client = new LifxClient();
 
 // Create our packet with for pulsing red color effect

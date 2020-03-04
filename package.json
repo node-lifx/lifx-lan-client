@@ -11,22 +11,16 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^10.0.3",
-    "babel-preset-env": "^1.7.0",
     "chai": "^4.2.0",
     "codecov.io": "^0.1.6",
     "eslint": "^5.16.0",
     "istanbul": "^0.4.0",
-    "mkdirp": "^0.5.1",
     "mocha": "^6.2.0",
-    "rimraf": "^2.7.1",
     "sinon": "^9.0.0"
   },
   "directories": {
     "test": "test",
-    "lib": "lib",
+    "lib": "src",
     "example": "example"
   },
   "homepage": "https://github.com/node-lifx/lifx-lan-client#readme",
@@ -38,27 +32,22 @@
     "lightbulb"
   ],
   "license": "MIT",
-  "main": "./lib/lifx",
-  "types": "./lib/lifx.d.ts",
+  "main": "./src/lifx",
+  "types": "./src/lifx.d.ts",
   "engines": {
-    "node": ">=4"
+    "node": ">=8.10"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/node-lifx/lifx-lan-client.git"
   },
   "scripts": {
-    "prepare": "npm run build",
-    "prebuild": "npm run clean && mkdirp lib/lifx && cp src/lifx/products.json lib/lifx && cp src/lifx.d.ts lib",
-    "build": "npm run prebuild && babel src --out-dir lib",
-    "build:watch": "npm run build -- --watch",
-    "clean": "rimraf lib",
     "lint": "eslint src/ test/ example/ cli.js",
     "lint:fix": "npm run lint -- --fix",
-    "pretest": "npm run lint && npm run build",
-    "unittest": "mocha -u bdd -r babelhook --recursive test/unit/ || true",
-    "unittest:bail": "mocha -u bdd -r babelhook --recursive test/unit/ --bail || true",
-    "test": "istanbul cover -root lib/ node_modules/mocha/bin/_mocha -- -u bdd -r babelhook --recursive test/unit/",
+    "pretest": "npm run lint",
+    "unittest": "mocha -u bdd --recursive test/unit/ || true",
+    "unittest:bail": "mocha -u bdd --recursive test/unit/ --bail || true",
+    "test": "istanbul cover -root src/ node_modules/mocha/bin/_mocha -- -u bdd --recursive test/unit/",
     "report-coverage": "cat ./coverage/coverage.json | node_modules/codecov.io/bin/codecov.io.js"
   }
 }
