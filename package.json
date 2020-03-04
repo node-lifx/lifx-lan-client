@@ -12,10 +12,10 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "codecov.io": "^0.1.6",
+    "codecov": "^3.6.5",
     "eslint": "^5.16.0",
-    "istanbul": "^0.4.0",
-    "mocha": "^6.2.0",
+    "mocha": "^7.1.0",
+    "nyc": "^15.0.0",
     "sinon": "^9.0.0"
   },
   "directories": {
@@ -45,9 +45,14 @@
     "lint": "eslint src/ test/ example/ cli.js",
     "lint:fix": "npm run lint -- --fix",
     "pretest": "npm run lint",
-    "unittest": "mocha -u bdd --recursive test/unit/ || true",
-    "unittest:bail": "mocha -u bdd --recursive test/unit/ --bail || true",
-    "test": "istanbul cover -root src/ node_modules/mocha/bin/_mocha -- -u bdd --recursive test/unit/",
-    "report-coverage": "cat ./coverage/coverage.json | node_modules/codecov.io/bin/codecov.io.js"
+    "unittest": "mocha || true",
+    "unittest:bail": "mocha --bail || true",
+    "test": "nyc --reporter=lcov mocha",
+    "report-coverage": "codecov"
+  },
+  "mocha": {
+    "ui": "bdd",
+    "recursive": true,
+    "spec": "test/unit/"
   }
 }
