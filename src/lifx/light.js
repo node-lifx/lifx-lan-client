@@ -529,4 +529,21 @@ Light.prototype.colorZones = function(startIndex, endIndex, hue, saturation, bri
   this.client.send(packetObj, callback);
 };
 
+/**
+ * Changes a color zone range to the given HSBK value
+ * @param {String} effectName sets the desired effect, currently available options are: MOVE, OFF
+ * @param {Number} speed sets duration of one cycle of the effect, the higher the value the slower the effect animation
+ * @param {String} direction whether to animate from or towards the controller, available options are: TOWARDS, AWAY
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.setMultiZoneEffect = function (effectName, speed, direction, callback) {
+  const packetObj = packet.create('setMultiZoneEffect', {
+    effect_type: lifx_constants.MULTIZONE_EFFECTS.indexOf(effectName),
+    speed: speed,
+    parameter2: lifx_constants.MULTIZONE_EFFECTS_MOVE_DIRECTION.indexOf(direction)
+  }, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+}
+
 exports.Light = Light;
