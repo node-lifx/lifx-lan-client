@@ -1,10 +1,8 @@
 'use strict';
 
-var _require = require('../../lifx'),
-    constants = _require.constants,
-    utils = _require.utils;
+const {constants, utils} = require('../../lifx');
 
-var Packet = {
+const Packet = {
   size: 59
 };
 
@@ -14,8 +12,8 @@ var Packet = {
  * @return {Object}     Information contained in packet
  */
 Packet.toObject = function (buf) {
-  var obj = {};
-  var offset = 0;
+  const obj = {};
+  let offset = 0;
 
   if (buf.length !== this.size) {
     throw new Error('Invalid length given for setMultiZoneEffect LIFX packet');

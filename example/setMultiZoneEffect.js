@@ -17,21 +17,21 @@ const packetObj = packet.create('setMultiZoneEffect', {
 }, client.source);
 
 // Function running when packet was received by light
-const callback = function() {
-  console.log('Packet send\n');
+const onPacketReceived = () => {
+  console.log('Packet sent\n');
 };
 
-client.on('light-new', function(light) {
+client.on('light-new', (light) => {
   console.log('New light found.');
   console.log('ID: ' + light.id);
 
   // Set the light id
   packetObj.target = light.id; // set target id to new light
-  client.send(packetObj, callback);
+  client.send(packetObj, onPacketReceived);
 });
 
 // Give feedback when running
-client.on('listening', function() {
+client.on('listening', () => {
   const address = client.address();
   console.log(
     'Started LIFX listening on ' +
