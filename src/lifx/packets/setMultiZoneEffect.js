@@ -31,7 +31,7 @@ Packet.toObject = function(buf) {
   obj.speed = buf.readUInt32LE(offset);
   offset += 4;
 
-  // Int64 is not supported. Not giving the value makes the effect infinite
+  // FIXME: Int64 is not supported. Not giving the value makes the effect infinite
   // obj.duration = utils.readUInt64LE(buf, offset);
   // obj.duration = new Int64(buf.readUInt32LE(offset), buf.readUInt32LE(offset + 4));
   offset += 8;
@@ -121,6 +121,7 @@ Packet.toBuffer = function(obj) {
   buf.writeUInt32LE(obj.speed, offset);
   offset += 4;
 
+  // FIXME: Disabled due to missing Int64 support in node
   // if (obj.duration === undefined) {
   //   throw new TypeError('obj.duration value must be given for setMultiZoneEffect LIFX packet');
   // }
