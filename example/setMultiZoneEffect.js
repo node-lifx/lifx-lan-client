@@ -11,9 +11,9 @@ const client = new LifxClient();
 
 // Create our packet with for move effect - runs infinite
 const packetObj = packet.create('setMultiZoneEffect', {
-  effect_type: constants.MULTIZONE_EFFECTS.indexOf('MOVE'), // MOVE or OFF
+  effectType: constants.MULTIZONE_EFFECTS.indexOf('MOVE'), // MOVE or OFF
   speed: 1000, // 1s - speed of one full animation cycle
-  parameter2: constants.MULTIZONE_EFFECTS_MOVE_DIRECTION.indexOf(args.direction) // TOWARDS or AWAY from controller
+  parameter2: constants.MULTIZONE_EFFECTS_MOVE_DIRECTION.indexOf('AWAY') // TOWARDS or AWAY from controller
 }, client.source);
 
 // Function running when packet was received by light

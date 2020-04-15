@@ -536,14 +536,14 @@ Light.prototype.colorZones = function(startIndex, endIndex, hue, saturation, bri
  * @param {String} direction whether to animate from or towards the controller, available options are: TOWARDS, AWAY
  * @param {Function} [callback] called when light did receive message
  */
-Light.prototype.setMultiZoneEffect = function (effectName, speed, direction, callback) {
+Light.prototype.setMultiZoneEffect = function(effectName, speed, direction, callback) {
   const packetObj = packet.create('setMultiZoneEffect', {
-    effect_type: lifx_constants.MULTIZONE_EFFECTS.indexOf(effectName),
+    effectType: constants.MULTIZONE_EFFECTS.indexOf(effectName),
     speed: speed,
-    parameter2: lifx_constants.MULTIZONE_EFFECTS_MOVE_DIRECTION.indexOf(direction)
+    parameter2: constants.MULTIZONE_EFFECTS_MOVE_DIRECTION.indexOf(direction)
   }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
-}
+};
 
 exports.Light = Light;

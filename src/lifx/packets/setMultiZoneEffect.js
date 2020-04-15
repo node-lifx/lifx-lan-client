@@ -1,6 +1,6 @@
 'use strict';
 
-const {constants, utils} = require('../../lifx');
+const {constants} = require('../../lifx');
 
 const Packet = {
   size: 59
@@ -11,7 +11,7 @@ const Packet = {
  * @param  {Buffer} buf Buffer containing only packet specific data no header
  * @return {Object}     Information contained in packet
  */
-Packet.toObject = function (buf) {
+Packet.toObject = function(buf) {
   const obj = {};
   let offset = 0;
 
@@ -19,10 +19,10 @@ Packet.toObject = function (buf) {
     throw new Error('Invalid length given for setMultiZoneEffect LIFX packet');
   }
 
-  obj.instanceid = buf.readUInt32LE(offset);
+  obj.instanceId = buf.readUInt32LE(offset);
   offset += 4;
 
-  obj.effect_type = buf.readUInt8(offset);
+  obj.effectType = buf.readUInt8(offset);
   offset += 1;
 
   // skip reserved field UInt16LE
@@ -32,8 +32,8 @@ Packet.toObject = function (buf) {
   offset += 4;
 
   // Int64 is not supported. Not giving the value makes the effect infinite
-  //obj.duration = utils.readUInt64LE(buf, offset);
-  //obj.duration = new Int64(buf.readUInt32LE(offset), buf.readUInt32LE(offset + 4));
+  // obj.duration = utils.readUInt64LE(buf, offset);
+  // obj.duration = new Int64(buf.readUInt32LE(offset), buf.readUInt32LE(offset + 4));
   offset += 8;
 
   // skip reserved field UInt32LE
@@ -46,7 +46,7 @@ Packet.toObject = function (buf) {
   // reserved for internal use
   offset += 4;
 
-  if (obj.type == constants.MULTIZONE_EFFECTS.indexOf('MOVE')) {
+  if (obj.type === constants.MULTIZONE_EFFECTS.indexOf('MOVE')) {
     obj.parameter2 = buf.readUInt32LE(offset);
     offset += 4;
     // skip parameter3
@@ -61,7 +61,7 @@ Packet.toObject = function (buf) {
     offset += 4;
     // skip parameter8
     offset += 4;
-  } else if (obj.type == constants.MULTIZONE_EFFECTS.indexOf('OFF')) {
+  } else if (obj.type === constants.MULTIZONE_EFFECTS.indexOf('OFF')) {
     // skip parameter2
     offset += 4;
     // skip parameter3
@@ -84,29 +84,29 @@ Packet.toObject = function (buf) {
 /**
  * Converts the given packet specific object into a packet
  * @param  {Object}  obj object with configuration data
- * @param  {Number}  obj.instanceid client identifier (set randomly)
- * @param  {Number}  obj.effect_type a constants.MULTIZONE_EFFECTS
+ * @param  {Number}  obj.instanceId client identifier (set randomly)
+ * @param  {Number}  obj.effectType a constants.MULTIZONE_EFFECTS
  * @param  {Number}  obj.speed speed in milliseconds for completing one animation if cyclic or for one animation frame if acyclic
  * @param  {Number}  obj.duration duration in nanosecond for how long the effect should last
  * @param  {Number}  obj.parameter2 a constants.MULTIZONE_EFFECTS_MOVE_DIRECTION if effect 'MOVE' is set
  * @return {Buffer}  packet
  */
-Packet.toBuffer = function (obj) {
+Packet.toBuffer = function(obj) {
   const buf = Buffer.alloc(this.size);
   buf.fill(0);
   let offset = 0;
 
-  // instanceid is random. Could be used to identify the event later on
+  // instanceId is random. Could be used to identify the event later on
   buf.writeUInt32LE(Math.floor(Math.random() * 1000), offset);
   offset += 4;
 
-  if (obj.effect_type === undefined) {
-    throw new TypeError('obj.effect_type value must be given for setMultiZoneEffect LIFX packet');
+  if (obj.effectType === undefined) {
+    throw new TypeError('obj.effectType value must be given for setMultiZoneEffect LIFX packet');
   }
-  if (typeof obj.effect_type !== 'number' && obj.effect_type < 0 || obj.effect_type > constants.MULTIZONE_EFFECTS.length - 1) {
+  if (typeof obj.effectType !== 'number' && obj.effectType < 0 || obj.effectType > constants.MULTIZONE_EFFECTS.length - 1) {
     throw new RangeError('Invalid type value given for setMultiZoneEffect LIFX packet, must be a number between 0 and ' + (constants.MULTIZONE_EFFECTS.length - 1));
   }
-  buf.writeUInt8(obj.effect_type, offset);
+  buf.writeUInt8(obj.effectType, offset);
   offset += 1;
 
   // skip reserved field UInt16LE
@@ -121,14 +121,14 @@ Packet.toBuffer = function (obj) {
   buf.writeUInt32LE(obj.speed, offset);
   offset += 4;
 
-  /*if (obj.duration === undefined) {
-    throw new TypeError('obj.duration value must be given for setMultiZoneEffect LIFX packet');
-  }
-  if (typeof obj.duration !== 'number') {
-    throw new TypeError('Invalid duration type given for setMultiZoneEffect LIFX packet, must be a number');
-  }*/
-  //utils.writeUInt64LE(buf, offset, obj.duration);
-  //obj.duration.toBuffer().copy(buf, offset);
+  // if (obj.duration === undefined) {
+  //   throw new TypeError('obj.duration value must be given for setMultiZoneEffect LIFX packet');
+  // }
+  // if (typeof obj.duration !== 'number') {
+  //   throw new TypeError('Invalid duration type given for setMultiZoneEffect LIFX packet, must be a number');
+  // }
+  // utils.writeUInt64LE(buf, offset, obj.duration);
+  // obj.duration.toBuffer().copy(buf, offset);
   offset += 8;
 
   // skip reserved field UInt32LE
@@ -142,7 +142,7 @@ Packet.toBuffer = function (obj) {
   offset += 4;
 
   // The following parameters vary depending on the effect
-  if (obj.effect_type == constants.MULTIZONE_EFFECTS.indexOf('MOVE')) {
+  if (obj.effectType === constants.MULTIZONE_EFFECTS.indexOf('MOVE')) {
     if (obj.parameter2 === undefined) {
       throw new TypeError('obj.parameter2 value must be given for setMultiZoneEffect (effect MOVE) LIFX packet');
     }
