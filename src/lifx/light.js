@@ -1,7 +1,7 @@
 'use strict';
 
 const {packet, constants, validate, utils} = require('../lifx');
-const {assign, pick} = require('lodash');
+const {assign, pick, includes, isNumber} = require('lodash');
 
 /**
  * A representation of a light bulb
@@ -537,6 +537,17 @@ Light.prototype.colorZones = function(startIndex, endIndex, hue, saturation, bri
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.setMultiZoneEffect = function(effectName, speed, direction, callback) {
+  if (!includes(constants.MULTIZONE_EFFECTS, effectName)) {
+    throw new TypeError('light.setMultiZoneEffect expects effectName to be one of "MOVE" or "OFF"');
+  }
+  if (!isNumber(speed)) {
+    throw new TypeError('light.setMultiZoneEffect expects speed to be a number');
+  }
+  if (!includes(constants.MULTIZONE_EFFECTS_MOVE_DIRECTION, direction)) {
+    throw new TypeError('light.setMultiZoneEffect expects direction to be one of "TOWARDS" or "AWAY"');
+  }
+  validate.optionalCallback(callback, 'light.setMultiZoneEffect');
+
   const packetObj = packet.create('setMultiZoneEffect', {
     effectType: constants.MULTIZONE_EFFECTS.indexOf(effectName),
     speed: speed,

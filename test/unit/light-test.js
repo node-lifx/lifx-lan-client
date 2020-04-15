@@ -35,6 +35,9 @@ describe('Light', () => {
     kelvin: 3500,
     duration: 0,
     zoneIndex: 0,
+    effectName: 'MOVE',
+    speed: 1000,
+    direction: 'TOWARDS',
     callback: () => {}
   };
 
@@ -617,5 +620,46 @@ describe('Light', () => {
       valid.brightness, valid.kelvin, valid.duration, valid.bool, valid.callback);
     assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
     currHandlerCnt += 1;
+  });
+
+  it('setting multizone effect', () => {
+    let currMsgQueCnt = getMsgQueueLength();
+    // eslint-disable-next-line prefer-const
+    let currHandlerCnt = getMsgHandlerLength();
+
+    // Error cases
+    assert.throw(() => {
+      // No arguments
+      bulb.setMultiZoneEffect();
+    }, TypeError);
+
+    assert.throw(() => {
+      // Too few arguments
+      bulb.setMultiZoneEffect('MOVE');
+    }, TypeError);
+
+    assert.throw(() => {
+      bulb.setMultiZoneEffect(not.string, valid.duration, valid.direction);
+    }, TypeError);
+
+    assert.throw(() => {
+      bulb.setMultiZoneEffect(valid.effectName, not.number, valid.direction);
+    }, TypeError);
+
+    assert.throw(() => {
+      bulb.setMultiZoneEffect(valid.effectName, valid.duration, not.string);
+    }, TypeError);
+
+    assert.throw(() => {
+      bulb.setMultiZoneEffect(valid.effectName, valid.duration, valid.direction, not.func);
+    }, TypeError);
+
+    bulb.setMultiZoneEffect('MOVE', 1000, 'TOWARDS');
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    currMsgQueCnt += 1;
+
+    bulb.setMultiZoneEffect('MOVE', 1000, 'TOWARDS', () => {});
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
   });
 });
