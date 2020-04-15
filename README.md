@@ -142,6 +142,16 @@ light.colorRgb(255, 0, 0); // Set to red
 light.colorRgb(255, 255, 0); // Set to yellow
 ```
 
+#### `light.setMultiZoneEffect(effectName, speed, direction, [callback])`
+Changes a color zone range to the given HSBK value
+
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+`effectName` | string | | Desired effect, currently available options are: `'MOVE'`, `'OFF'`
+`speed` | number | | Duration of one cycle of the effect, the higher the value the slower the effect animation
+`direction` | string | | Animate from or towards the controller, available options are: `'TOWARDS'`, `'AWAY'`
+`callback` | function | null | Called after command has reached the light
+
 #### `light.maxIR(brightness, callback)`
 Set's the maximum infrared brightness of the light (only for lights that support infrared light)
 
