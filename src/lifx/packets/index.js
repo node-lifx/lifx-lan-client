@@ -57,6 +57,7 @@ packets.stateLight = require('./stateLight');
 
 packets.setColor = require('./setColor');
 packets.setWaveform = require('./setWaveform');
+packets.setMultiZoneEffect = require('./setMultiZoneEffect');
 
 packets.getTemperature = require('./getTemperature');
 packets.stateTemperature = require('./stateTemperature');
