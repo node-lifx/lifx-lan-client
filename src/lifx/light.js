@@ -186,6 +186,7 @@ Light.prototype.getMaxIR = function(callback) {
 
   const packetObj = packet.create('getInfrared', {}, this.client.source);
   packetObj.target = this.id;
+  packetObj.resRequired = true;
   const sqnNumber = this.client.send(packetObj);
   this.client.addMessageHandler('stateInfrared', function(err, msg) {
     if (err) {
