@@ -138,6 +138,37 @@ validate.optionalBoolean = function(value, parameter, context) {
 };
 
 /**
+ * Checks validity of an optional number
+ * @param {any} value value to validate
+ * @param {any} parameter validated parameter name
+ * @param {String} context validation context
+ */
+validate.optionalNumber = function(value, parameter, context) {
+  if (value !== undefined && typeof value !== 'number') {
+    throwTypeError('LIFX %s expects "%s" to be a number', context, parameter);
+  }
+};
+
+/**
+ * Checks validity of an waveform id
+ * @param {any} value value to validate
+ * @param {String} context validation context
+ */
+validate.optionalWaveform = function(value, context) {
+  if (value !== undefined && typeof value !== 'number') {
+    throwTypeError('LIFX %s expects "%s" to be a number', context, 'waveform');
+  }
+  if (value !== undefined) {
+    if (value < 0) {
+      throwTypeError('LIFX %s expects "%s" to be >= 0', context, 'waveform');
+    }
+    if (value > 4) {
+      throwTypeError('LIFX %s expects "%s" to be <= 4', context, 'waveform');
+    }
+  }
+};
+
+/**
  * Checks validity of a light zone index
  * @param {any} index Light zone index to validate
  * @param {String} context validation context

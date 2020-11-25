@@ -366,6 +366,95 @@ describe('Light', () => {
     currHandlerCnt += 1;
   });
 
+  it('setting the waveform of a light', () => {
+    let currMsgQueCnt = getMsgQueueLength();
+    let currHandlerCnt = getMsgHandlerLength();
+
+    // Error cases
+    assert.throw(() => {
+      // No arguments
+      bulb.waveform();
+    }, TypeError);
+
+    assert.throw(() => {
+      // Too few arguments
+      bulb.waveform(constant.HSBK_MINIMUM_HUE);
+    }, TypeError);
+
+    assert.throw(() => {
+      // Too few arguments
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MINIMUM_SATURATION);
+    }, TypeError);
+
+    assert.throw(() => {
+      // Saturation too low
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MINIMUM_SATURATION - 1, constant.HSBK_MINIMUM_BRIGHTNESS);
+    }, RangeError);
+
+    assert.throw(() => {
+      // Saturation too high
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MAXIMUM_SATURATION + 1, constant.HSBK_MINIMUM_BRIGHTNESS);
+    }, RangeError);
+
+    assert.throw(() => {
+      // Hue too low
+      bulb.waveform(constant.HSBK_MINIMUM_HUE - 1, constant.HSBK_MINIMUM_SATURATION, constant.HSBK_MINIMUM_BRIGHTNESS);
+    }, RangeError);
+
+    assert.throw(() => {
+      // Hue too high
+      bulb.waveform(constant.HSBK_MAXIMUM_HUE + 1, constant.HSBK_MINIMUM_SATURATION, constant.HSBK_MINIMUM_BRIGHTNESS);
+    }, RangeError);
+
+    assert.throw(() => {
+      // Brightness too low
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MINIMUM_SATURATION, constant.HSBK_MINIMUM_BRIGHTNESS - 1);
+    }, RangeError);
+
+    assert.throw(() => {
+      // Brightness too high
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MINIMUM_SATURATION, constant.HSBK_MAXIMUM_BRIGHTNESS + 1);
+    }, RangeError);
+
+    assert.throw(() => {
+      // Kelvin too high
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MINIMUM_SATURATION, constant.HSBK_MAXIMUM_BRIGHTNESS, constant.HSBK_MAXIMUM_KELVIN + 1);
+    }, RangeError);
+
+    assert.throw(() => {
+      // Kelvin not a number
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MINIMUM_SATURATION, constant.HSBK_MAXIMUM_BRIGHTNESS, '100');
+    }, TypeError);
+
+    assert.throw(() => {
+      // Invalid callback
+      bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MAXIMUM_SATURATION, constant.HSBK_MINIMUM_BRIGHTNESS, constant.HSBK_MAXIMUM_KELVIN, undefined, undefined, undefined, undefined, undefined, []);
+    }, TypeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    // Success cases
+    bulb.waveform(constant.HSBK_MAXIMUM_HUE, constant.HSBK_MINIMUM_SATURATION, constant.HSBK_MAXIMUM_BRIGHTNESS);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'package added to the queue');
+    currMsgQueCnt += 1;
+    assert.equal(getMsgHandlerLength(), currHandlerCnt, 'no handler added');
+
+    bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MAXIMUM_SATURATION, constant.HSBK_MINIMUM_BRIGHTNESS, constant.HSBK_MINIMUM_KELVIN);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'package added to the queue');
+    currMsgQueCnt += 1;
+    assert.equal(getMsgHandlerLength(), currHandlerCnt, 'no handler added');
+
+    bulb.waveform(constant.HSBK_MINIMUM_HUE, constant.HSBK_MAXIMUM_SATURATION, constant.HSBK_MINIMUM_BRIGHTNESS, constant.HSBK_MINIMUM_KELVIN, true, 1000, 10, 0.1, 1, () => {});
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'package added to the queue');
+    currMsgQueCnt += 1;
+    assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
+    currHandlerCnt += 1;
+
+    bulb.waveform(constant.HSBK_MINIMUM_BRIGHTNESS, constant.HSBK_MAXIMUM_SATURATION, constant.HSBK_MINIMUM_BRIGHTNESS, constant.HSBK_MINIMUM_KELVIN, true, 100);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'package added to the queue');
+    currMsgQueCnt += 1;
+    assert.equal(getMsgHandlerLength(), currHandlerCnt, 'no handler added');
+  });
+
   it('getting light summary', () => {
     assert.throw(() => {
       bulb.getState('test');

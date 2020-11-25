@@ -148,6 +148,52 @@ Light.prototype.maxIR = function(brightness, callback) {
 };
 
 /**
+ * Apply a waveform effect to the bulb.
+ * @param {Number} hue        color hue from 0 - 360 (in °)
+ * @param {Number} saturation color saturation from 0 - 100 (in %)
+ * @param {Number} brightness color brightness from 0 - 100 (in %)
+ * @param {Number} [kelvin=3500]   color kelvin between 2500 and 9000
+ * @param {Boolean} [transient=false] color does not persist
+ * @param {Number} [period=500] duration of a cycle in miliseconds
+ * @param {Number} [cycles=10e30] number of cycles
+ * @param {Number} [skewRatio=0.5] waveform skew, between 0 and 1
+ * @param {Number} [waveform=0] waveform to use for transition
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.waveform = function(hue, saturation, brightness, kelvin, transient = false, period = 500, cycles = 10e30, skewRatio = 0.5, waveform = 0, callback) {
+  validate.colorHsb(hue, saturation, brightness, 'light waveform method');
+
+  validate.optionalKelvin(kelvin, 'light waveform method');
+  validate.optionalBoolean(transient, 'transient', 'light waveform method');
+  validate.optionalNumber(period, 'period', 'light waveform method');
+  validate.optionalNumber(cycles, 'cycles', 'light waveform method');
+  validate.optionalNumber(skewRatio, 'skewRatio', 'light waveform method');
+  validate.optionalWaveform(waveform, 'light waveform method');
+  validate.optionalCallback(callback, 'light waveform method');
+
+  // Convert HSB values to packet format
+  hue = Math.round(hue / constants.HSBK_MAXIMUM_HUE * 65535);
+  saturation = Math.round(saturation / constants.HSBK_MAXIMUM_SATURATION * 65535);
+  brightness = Math.round(brightness / constants.HSBK_MAXIMUM_BRIGHTNESS * 65535);
+
+  const packetObj = packet.create('setWaveform', {
+    color: {
+      hue: hue,
+      saturation: saturation,
+      brightness: brightness,
+      kelvin: kelvin
+    },
+    isTransient: transient,
+    period,
+    cycles,
+    skewRatio: (skewRatio * 65535) - 32768,
+    waveform
+  }, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/**
  * Requests the current state of the light
  * @param {Function} callback a function to accept the data
  */
