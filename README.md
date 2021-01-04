@@ -156,6 +156,31 @@ light.maxIR(0); // Set's a maximum infrared brightness of 0
 light.maxIR(25); // Set's a maximum infrared brightness of 25
 ```
 
+#### `light.waveform(hue, saturation, brightness, [kelvin], [transient], [period], [cycles], [skewRatio], [waveform], [callback])`
+Apply a waveform effect to the bulb.
+
+Also see the [LIFX waveform docs](https://lan.developer.lifx.com/docs/waveforms)
+
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+`hue` | int | | Between 0 and 360, representing the color hue in degree which changes the color.
+`saturation` | int | | Between 0 and 100, representing the color intensity from 0% to 100%.
+`brightness` | int | | Between 0 and 100, representing the light brightness from 0% to 100%.
+`kelvin` | int | 3500 | Between 2500 and 9000, representing the color temperature.
+`transient` | boolean | false | Whether to return to the previous color after the effect.
+`period` | int | 500 | Duration of a cycle in miliseconds.
+`cycles` | float | 10e30 | Number of wave cycles to stop after. Default value is effectively never. Total duration of the effect will be period * cycles.
+`skewRatio` | float | 0.5 | The skew ratio to use for pulse waveforms (percentage of the time the old color is visible per period), between 0 and 1.
+`waveform` | int | 0 | The [waveform to use](https://lan.developer.lifx.com/docs/waveforms), between 0 and 4. 0 = SAW, 1 = SINE, 2 = HALF_SINE, 3 = TRIANGLE, 4 = PULSE.
+`callback` | function | null | `function(error) {}` Called after the command has reached the light or after `client.resendMaxTimes` with `client.resendPacketDelay` in case it has not. `error` is `null` in case of success and given if the sending has failed.
+_Note: Using callback multiplies network load for this command by two or more times._
+
+Usage examples:
+```js
+light.waveform(0, 100, 50); // Set to a basic red wave at 50% brightness
+light.waveform(50, 50, 80, 3500, true, 200, 5); // Set to a light green wave at 80% brightness over next two seconds, which will return to the previous color after five 200ms cycles
+```
+
 #### `light.getMaxIR(callback)`
 Requests the maximum infrared brightness of the light (only for lights that support infrared light)
 
