@@ -80,3 +80,11 @@ packets.setColorZones = require('./setColorZones');
 
 packets.stateZone = require('./stateZone');
 packets.stateMultiZone = require('./stateMultiZone');
+
+/*
+ * LIFX Switch device related packages
+ */
+packets.getRelayPower = require('./getRelayPower');
+packets.setRelayPower = require('./setRelayPower');
+packets.stateRelayPower = require('./stateRelayPower');
+
