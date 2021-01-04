@@ -1,6 +1,6 @@
 'use strict';
 
-const LifxClient = require('../lib/lifx').Client;
+const LifxClient = require('../src/lifx').Client;
 const client = new LifxClient();
 
 client.on('light-new', function(light) {

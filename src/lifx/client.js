@@ -591,7 +591,9 @@ Client.prototype.address = function() {
   let address = null;
   try {
     address = this.socket.address();
-  } catch (e) {}
+  } catch (e) {
+    // ignored
+  }
   return address;
 };
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const Lifx = require('./lib/lifx').Client;
+const Lifx = require('./src/lifx').Client;
 const client = new Lifx();
 
 client.on('error', function(err) {
