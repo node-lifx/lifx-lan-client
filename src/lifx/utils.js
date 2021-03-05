@@ -138,7 +138,7 @@ utils.buildColorsHsbk = function(colors, size) {
   if (typeof size !== 'number') {
     size = 0;
   }
-  return (new Array(size))
+  return Array(size)
     .fill(undefined)
     .map((_, idx) => this.toColorHsbk(colors[idx] || {}));
 };
