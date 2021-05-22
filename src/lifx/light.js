@@ -1,7 +1,7 @@
 'use strict';
 
 const {packet, constants, validate, utils} = require('../lifx');
-const {assign, pick} = require('lodash');
+const {assign, pick, includes, isNumber} = require('lodash');
 
 /**
  * A representation of a light bulb
@@ -571,6 +571,34 @@ Light.prototype.colorZones = function(startIndex, endIndex, hue, saturation, bri
     kelvin: kelvin,
     duration: duration,
     apply: appReq
+  }, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/**
+ * Changes a color zone range to the given HSBK value
+ * @param {String} effectName sets the desired effect, currently available options are: MOVE, OFF
+ * @param {Number} speed sets duration of one cycle of the effect, the higher the value the slower the effect animation
+ * @param {String} direction whether to animate from or towards the controller, available options are: TOWARDS, AWAY
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.setMultiZoneEffect = function(effectName, speed, direction, callback) {
+  if (!includes(constants.MULTIZONE_EFFECTS, effectName)) {
+    throw new TypeError('light.setMultiZoneEffect expects effectName to be one of "MOVE" or "OFF"');
+  }
+  if (!isNumber(speed)) {
+    throw new TypeError('light.setMultiZoneEffect expects speed to be a number');
+  }
+  if (!includes(constants.MULTIZONE_EFFECTS_MOVE_DIRECTION, direction)) {
+    throw new TypeError('light.setMultiZoneEffect expects direction to be one of "TOWARDS" or "AWAY"');
+  }
+  validate.optionalCallback(callback, 'light.setMultiZoneEffect');
+
+  const packetObj = packet.create('setMultiZoneEffect', {
+    effectType: constants.MULTIZONE_EFFECTS.indexOf(effectName),
+    speed: speed,
+    parameter2: constants.MULTIZONE_EFFECTS_MOVE_DIRECTION.indexOf(direction)
   }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);

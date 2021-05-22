@@ -85,9 +85,9 @@ Packet.typeList = [
   {id: 503, name: 'stateZone'},
   {id: 504, name: 'getCountZone'},
   {id: 505, name: 'stateCountZone'},
-  {id: 506, name: 'stateMultiZone'}
+  {id: 506, name: 'stateMultiZone'},
   // {id: 507, name: 'getEffectZone'},
-  // {id: 508, name: 'setEffectZone'},
+  {id: 508, name: 'setMultiZoneEffect'}
   // {id: 509, name: 'stateEffectZone'}
 ];
 

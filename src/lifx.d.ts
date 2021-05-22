@@ -278,6 +278,15 @@ export class Light {
   maxIR(brightness: any, callback: any): void;
 
   /**
+   * Changes a color zone range to the given HSBK value
+   * @param {String} effectName sets the desired effect, currently available options are: MOVE, OFF
+   * @param {Number} speed sets duration of one cycle of the effect, the higher the value the slower the effect animation
+   * @param {String} direction whether to animate from or towards the controller, available options are: TOWARDS, AWAY
+   * @param {Function} [callback] called when light did receive message
+   */
+  setMultiZoneEffect(effectName: 'MOVE' | 'OFF', speed: number, direction: 'TOWARDS' | 'AWAY', callback?: () => void);
+
+  /**
   * Turns the light off
   * @example light('192.168.2.130').off()
   * @param {Number} [duration] transition time in milliseconds
@@ -377,6 +386,8 @@ export const constants: {
   }[];
   LIGHT_WAVEFORMS: string[];
   ORIGIN_BITS: number;
+  MULTIZONE_EFFECTS_MOVE_DIRECTION: string[];
+  MULTIZONE_EFFECTS: string[];
   PACKET_HEADER_SEQUENCE_MAX: number;
   PACKET_HEADER_SIZE: number;
   PACKET_TRANSACTION_TYPES: {
