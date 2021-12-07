@@ -268,7 +268,8 @@ utils.getHardwareDetails = function(vendorId, productId) {
           return {
             vendorName: productDetailList[i].name,
             productName: productDetailList[i].products[j].name,
-            productFeatures: productDetailList[i].products[j].features
+            productFeatures: productDetailList[i].products[j].features,
+            productUpgrades: productDetailList[i].products[j].upgrades
           };
         }
       }

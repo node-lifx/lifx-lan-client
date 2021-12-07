@@ -317,6 +317,34 @@ export class Light {
   reboot(callback: any): void;
 }
 
+export interface Product {
+  vendorName:       string;
+  productName:      string;
+  productFeatures:  Features;
+  productUpgrades:  Upgrade[];
+}
+
+export interface Features {
+  hev?:                            boolean;
+  color:                           boolean;
+  chain:                           boolean;
+  matrix:                          boolean;
+  relays?:                         boolean;
+  buttons?:                        boolean;
+  infrared:                        boolean;
+  multizone:                       boolean;
+  temperature_range?:              number[] | null;
+  extended_multizone?:             boolean;
+  min_ext_mz_firmware?:            number;
+  min_ext_mz_firmware_components?: number[];
+}
+
+export interface Upgrade {
+  major:    number;
+  minor:    number;
+  features: Features;
+}
+
 export const constants: {
   ACK_REQUIRED_BIT: number;
   ADDRESSABLE_BIT: number;
@@ -457,9 +485,9 @@ export namespace utils {
   * hsb integer object
   * @param {Number} vendorId id of the vendor
   * @param {Number} productId id of the product
-  * @return {Object|Boolean} product and details vendor details or false if not found
+  * @return {Product|Boolean} product and details vendor details or false if not found
   */
-  function getHardwareDetails(vendorId: number, productId: number): Object | boolean;
+  function getHardwareDetails(vendorId: number, productId: number): Product | boolean;
 
   /**
   * Return all ip addresses of the machine
