@@ -1,4 +1,14 @@
+import { RemoteInfo } from "dgram";
+
 export class Client {
+
+  on(event: 'error', listener: (err: Error) => void): this;
+  on(event: 'message', listener: (msg: Buffer, info: RemoteInfo) => void): this;
+  on(event: 'listening'): this;
+  on(event: 'light-offline', listener: (info: Light) => void): this;
+  on(event: 'light-online', listener: (info: Light) => void): this;
+  on(event: 'light-new', listener: (info: Light) => void): this;
+  on(event: 'discovery-completed'): this;
 
   /**
   * Creates a lifx client
@@ -318,30 +328,30 @@ export class Light {
 }
 
 export interface Product {
-  vendorName:       string;
-  productName:      string;
-  productFeatures:  Features;
-  productUpgrades:  Upgrade[];
+  vendorName: string;
+  productName: string;
+  productFeatures: Features;
+  productUpgrades: Upgrade[];
 }
 
 export interface Features {
-  hev?:                            boolean;
-  color:                           boolean;
-  chain:                           boolean;
-  matrix:                          boolean;
-  relays?:                         boolean;
-  buttons?:                        boolean;
-  infrared:                        boolean;
-  multizone:                       boolean;
-  temperature_range?:              number[] | null;
-  extended_multizone?:             boolean;
-  min_ext_mz_firmware?:            number;
+  hev?: boolean;
+  color: boolean;
+  chain: boolean;
+  matrix: boolean;
+  relays?: boolean;
+  buttons?: boolean;
+  infrared: boolean;
+  multizone: boolean;
+  temperature_range?: number[] | null;
+  extended_multizone?: boolean;
+  min_ext_mz_firmware?: number;
   min_ext_mz_firmware_components?: number[];
 }
 
 export interface Upgrade {
-  major:    number;
-  minor:    number;
+  major: number;
+  minor: number;
   features: Features;
 }
 
