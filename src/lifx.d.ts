@@ -143,6 +143,14 @@ export class Client {
 
 export class Light {
 
+  public client : Client;
+  public id : string;
+  public address : string;
+  public port : number;
+  public label : string;
+  public status : string;
+  public seenOnDiscovery : number;
+
   /**
   * A representation of a light bulb
   * @class
