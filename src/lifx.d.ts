@@ -1,367 +1,328 @@
-export class Client {
+import {RemoteInfo} from 'dgram';
+import {EventEmitter} from 'eventemitter3';
+import {AddressInfo} from 'net';
 
-  /**
-  * Creates a lifx client
-  * @extends EventEmitter
-  */
-  constructor();
+export class ClientOptions {
+  /** The IPv4 address to bind to  */
+  address: string = '0.0.0.0';
+  /** The port to bind to */
+  port: number = 0;
+  /** Show debug output */
+  debug: boolean = false;
+  /** If light hasn't answered for amount of discoveries it is set offline */
+  lightOfflineTolerance: number = 3;
+  /** Message handlers not called will be removed after this delay in ms */
+  messageHandlerTimeout: number = 45000;
+  /** The source to send to light, must be 8 chars lowercase or digit */
+  source: string = '';
+  /** Whether to start discovery after initialization or not */
+  startDiscovery: boolean = true;
+  /** Pre set list of ip addresses of known addressable lights */
+  lights: string[] = [];
+  stopAfterDiscovery: boolean = false;
+  /** The broadcast address to use for light discovery */
+  broadcast: string = '255.255.255.255';
+  sendPort: number = constants.LIFX_DEFAULT_PORT;
+  resendPacketDelay: number = 150;
+  resendMaxTimes: number = 3;
+  messageRateLimit: number = 50;
+  discoveryInterval: number = 5000;
+}
 
-  /**
-  * Adds a message handler that calls a function when the requested
-  * info was received
-  * @param {String} type A type of packet to listen for, like stateLight
-  * @param {Function} callback the function to call if the packet was received,
-  *                   this will be called with parameters msg and rinfo
-  * @param {Number} [sequenceNumber] Expects a specific sequenceNumber on which will
-  *                                  be called, this will call it only once. If not
-  *                                  given the callback handler is permanent
-  */
-  addMessageHandler(type: any, callback: any, sequenceNumber: any): void;
+export interface Client extends EventEmitter {
 
-  /**
-  * Get network address data from connection
-  * @return {Object} Network address data
-  */
-  address(): any;
+  on(event: 'error', callback: (err: Error) => void): this;
+  on(event: 'message', callback: (msg: any, info: RemoteInfo) => void): this;
+  on(event: 'listening', callback: () => void): this;
+  on(event: 'light-offline', callback: (info: Light) => void): this;
+  on(event: 'light-online', callback: (info: Light) => void): this;
+  on(event: 'light-new', callback: (info: Light) => void): this;
+  on(event: 'discovery-completed', callback: () => void): this;
 
-  /**
-  * Destroy an instance
-  */
+  /** Get network address data from connection */
+  address(): AddressInfo;
+
+  /** Close client */
   destroy(): void;
 
-  /**
-  * Creates a new socket and starts discovery
-  * @example
-  * init({debug: true}, function() {
-  *   console.log('Client started');
-  * })
-  * @param {Object} [options] Configuration to use
-  * @param {String} [options.address] The IPv4 address to bind to
-  * @param {Number} [options.port] The port to bind to
-  * @param {Boolean} [options.debug] Show debug output
-  * @param {Number} [options.lightOfflineTolerance] If light hasn't answered for amount of discoveries it is set offline
-  * @param {Number} [options.messageHandlerTimeout] Message handlers not called will be removed after this delay in ms
-  * @param {String} [options.source] The source to send to light, must be 8 chars lowercase or digit
-  * @param {Boolean} [options.startDiscovery] Weather to start discovery after initialization or not
-  * @param {Array} [options.lights] Pre set list of ip addresses of known addressable lights
-  * @param {String} [options.broadcast] The broadcast address to use for light discovery
-  * @param {Function} [callback] Called after initialation
-  */
-  init(options: any, callback: any): any;
+  /** Creates a new socket and starts discovery */
+  init(options: ClientOptions, callback: () => void): void;
 
-  /**
-  * Find a light by label, id or ip
-  * @param {String} identifier label, id or ip to search for
-  * @return {Object|Boolean} the light object or false if not found
+  /** Find a light
+  * @param identifier label, id or ip to search for
   */
-  light(identifier: any): any;
+  light(identifier: string): Light | false;
 
-  /**
-  * Returns the list of all known lights
-  * @example client.lights()
-  * @param {String} [status='on'] Status to filter for, empty string for all
-  * @return {Array} Lights
+  /** Get lights with status
+  * @param status Status to filter for, empty string for all
   */
-  lights(status: any): any;
+  lights(status: string): Light[];
 
-  /**
-  * Processes a discovery report packet to update internals
-  * @param {Object} err Error if existant
-  * @param {Object} msg The discovery report package
-  * @param {Object} rinfo Remote host details
+  /** Send a LIFX message objects over the network
+  * @param msg A message object or multiple with data to send
+  * @param callback Function to handle error and success after send
+  * @return The sequence number of the request
   */
-  processDiscoveryPacket(err: any, msg: any, rinfo: any): void;
+  send(msg: any, callback: (err: Error, msg: any, rinfo: RemoteInfo) => void): number;
 
-  /**
-  * Processes a state label packet to update internals
-  * @param {Object} err Error if existant
-  * @param {Object} msg The state label package
-  */
-  processLabelPacket(err: any, msg: any): void;
-
-  /**
-  * Checks all registered message handlers if they request the given message
-  * @param {Object} msg message to check handler for
-  * @param {Object} rinfo rinfo address info to check handler for
-  */
-  processMessageHandlers(msg: any, rinfo: any): any;
-
-  /**
-  * Send a LIFX message objects over the network
-  * @param  {Object} msg A message object or multiple with data to send
-  * @param  {Function} [callback] Function to handle error and success after send
-  * @return {Number} The sequence number of the request
-  */
-  send(msg: any, callback: any): any;
-
-  /**
-  * Sends a packet from the messages queue or stops the sending process
-  * if queue is empty
-  **/
-  sendingProcess(): any;
-
-  /**
-  * Sets debug on or off at runtime
-  * @param {Boolean} debug debug messages on
-  */
-  setDebug(debug: any): void;
+  /** enable or disable debug at runtime */
+  setDebug(debug: boolean): void;
 
   /**
   * Start discovery of lights
-  * This will keep the list of lights updated, finds new lights and sets lights
-  * offline if no longer found
-  * @param {Array} [lights] Pre set list of ip addresses of known addressable lights to request directly
+  * This keeps the list of lights updated, finds new lights and sets lights offline if no longer found
+  * @param lights Pre set list of ip addresses of known addressable lights to request directly
   */
-  startDiscovery(lights: any): void;
-
-  /**
-  * Starts the sending of all packages in the queue
-  */
-  startSendingProcess(): void;
+  startDiscovery(lights: string[]): void;
 
   /**
   * This stops the discovery process
   * The client will be no longer updating the state of lights or find lights
   */
   stopDiscovery(): void;
-
-  /**
-  * Stops sending of all packages in the queue
-  */
-  stopSendingProcess(): void;
 }
 
-export class Light {
+export interface LightOptions {
+  client: Client;
+  id: string;
+  address: string;
+  port: number;
+  seenOnDiscovery: number;
+}
 
-  /**
-  * A representation of a light bulb
-  * @class
-  * @param {Obj} constr constructor object
-  * @param {Lifx/Client} constr.client the client the light belongs to
-  * @param {String} constr.id the id used to target the light
-  * @param {String} constr.address ip address of the light
-  * @param {Number} constr.port port of the light
-  * @param {Number} constr.seenOnDiscovery on which discovery the light was last seen
-  */
-  constructor(constr: any);
+export interface LightColor {
+  hue: number;
+  saturation: number;
+  brightness: number;
+  kelvin: number;
+}
+
+/** A representation of a light bulb */
+export interface Light {
+  constructor(constr: LightOptions): Light;
+
+  client: Client;
+  id: string;
+  address: string;
+  port: number;
+  label: string;
+  status: string;
+  seenOnDiscovery: number;
 
   /**
   * Changes the color to the given HSBK value
-  * @param {Number} hue        color hue from 0 - 360 (in °)
-  * @param {Number} saturation color saturation from 0 - 100 (in %)
-  * @param {Number} brightness color brightness from 0 - 100 (in %)
-  * @param {Number} [kelvin=3500]   color kelvin between 2500 and 9000
-  * @param {Number} [duration] transition time in milliseconds
-  * @param {Function} [callback] called when light did receive message
+  * @param hue color hue from 0 - 360 (in °)
+  * @param saturation color saturation from 0 - 100 (in %)
+  * @param brightness color brightness from 0 - 100 (in %)
+  * @param kelvin color kelvin between 2500 and 9000
+  * @param duration transition time in milliseconds
+  * @param callback called when light did receive message
   */
-  color(hue: any, saturation: any, brightness: any, kelvin: any, duration: any, callback: any): void;
+  color(hue: number, saturation: number, brightness: number, kelvin: number, duration: number, callback: (err: Error) => void): void;
 
   /**
   * Changes the color to the given rgb value
   * Note RGB poorly represents the color of light, prefer setting HSBK values with the color method
   * @example light.colorRgb(255, 0, 0)
-  * @param {Integer} red value between 0 and 255 representing amount of red in color
-  * @param {Integer} green value between 0 and 255 representing amount of green in color
-  * @param {Integer} blue value between 0 and 255 representing amount of blue in color
-  * @param {Number} [duration] transition time in milliseconds
-  * @param {Function} [callback] called when light did receive message
+  * @param red value between 0 and 255 representing amount of red in color
+  * @param green value between 0 and 255 representing amount of green in color
+  * @param blue value between 0 and 255 representing amount of blue in color
+  * @param duration transition time in milliseconds
+  * @param callback called when light did receive message
   */
-  colorRgb(red: any, green: any, blue: any, duration: any, callback: any): void;
+  colorRgb(red: number, green: number, blue: number, duration: number, callback: (err: Error) => void): void;
 
   /**
   * Changes the color to the given rgb value
   * Note RGB poorly represents the color of light, prefer setting HSBK values with the color method
   * @example light.colorRgb('#FF0000')
-  * @param {String} hexString rgb hex string starting with # char
-  * @param {Number} [duration] transition time in milliseconds
-  * @param {Function} [callback] called when light did receive message
+  * @param hexString rgb hex string starting with # char
+  * @param duration transition time in milliseconds
+  * @param callback called when light did receive message
   */
-  colorRgbHex(hexString: any, duration: any, callback: any): void;
-
-  /**
-  * Changes a color zone range to the given HSBK value
-  * @param {Number} startIndex start zone index from 0 - 255
-  * @param {Number} endIndex start zone index from 0 - 255
-  * @param {Number} hue color hue from 0 - 360 (in °)
-  * @param {Number} saturation color saturation from 0 - 100 (in %)
-  * @param {Number} brightness color brightness from 0 - 100 (in %)
-  * @param {Number} [kelvin=3500] color kelvin between 2500 and 9000
-  * @param {Number} [duration] transition time in milliseconds
-  * @param {Boolean} [apply=true] apply changes immediately or leave pending for next apply
-  * @param {Function} [callback] called when light did receive message
-  */
-  colorZones(startIndex: any, endIndex: any, hue: any, saturation: any, brightness: any, kelvin: any, duration: any, apply: any, callback: any): void;
-
-  /**
-  * Requests ambient light value of the light
-  * @param {Function} callback a function to accept the data
-  */
-  getAmbientLight(callback: any): void;
-
-  /**
-  * Requests the current color zone state of the light
-  * @param {Number} startIndex start color zone index
-  * @param {Number} [endIndex] end color zone index
-  * @param {Function} callback a function to accept the data
-  */
-  getColorZones(startIndex: any, endIndex: any, callback: any): void;
-
-  /**
-  * Requests infos from the microcontroller unit of the light
-  * @param {Function} callback a function to accept the data
-  */
-  getFirmwareInfo(callback: any): void;
-
-  /**
-  * Requests used version from the microcontroller unit of the light
-  * @param {Function} callback a function to accept the data
-  */
-  getFirmwareVersion(callback: any): void;
-
-  /**
-  * Requests hardware info from the light
-  * @param {Function} callback a function to accept the data with error and
-  *                   message as parameters
-  */
-  getHardwareVersion(callback: any): void;
-
-  /**
-  * Requests the label of the light
-  * @param {Function} callback a function to accept the data
-  * @param {Boolean} [cache=false] return cached result if existent
-  * @return {Function} callback(err, label)
-  */
-  getLabel(callback: any, cache: any): void;
-
-  /**
-  * Requests the current maximum setting for the infrared channel
-  * @param  {Function} callback a function to accept the data
-  */
-  getMaxIR(callback: any): void;
-
-  /**
-  * Requests the power level of the light
-  * @param {Function} callback a function to accept the data
-  */
-  getPower(callback: any): void;
-
-  /**
-  * Requests the current state of the light
-  * @param {Function} callback a function to accept the data
-  */
-  getState(callback: any): void;
-
-  /**
-  * Requests uptime from the light
-  * @param {Function} callback a function to accept the data with error and message as parameters
-  */
-  getUptime(callback: any): void;
-
-  /**
-  * Requests wifi infos from for the light
-  * @param {Function} callback a function to accept the data
-  */
-  getWifiInfo(callback: any): void;
-
-
-  /**
-  * Requests used version from the wifi controller unit of the light (wifi firmware version)
-  * @param {Function} callback a function to accept the data
-  */
-  getWifiVersion(callback: any): void;
-
-  /**
-  * Sets the Maximum Infrared brightness
-  * @param {Number} brightness infrared brightness from 0 - 100 (in %)
-  * @param {Function} [callback] called when light did receive message
-  */
-  maxIR(brightness: any, callback: any): void;
+  colorRgbHex(hexString: string, duration: number, callback: (err: Error) => void): void;
 
   /**
    * Changes a color zone range to the given HSBK value
-   * @param {String} effectName sets the desired effect, currently available options are: MOVE, OFF
-   * @param {Number} speed sets duration of one cycle of the effect, the higher the value the slower the effect animation
-   * @param {String} direction whether to animate from or towards the controller, available options are: TOWARDS, AWAY
-   * @param {Function} [callback] called when light did receive message
+   * @param startIndex start zone index from 0 - 255
+   * @param endIndex end zone index from 0 - 255
+   * @param hue color hue from 0 - 360 (in °)
+   * @param saturation color saturation from 0 - 100 (in %)
+   * @param brightness color brightness from 0 - 100 (in %)
+   * @param kelvin color kelvin between 2500 and 9000
+   * @param duration transition time in milliseconds
+   * @param apply apply changes immediately or leave pending for next apply
+   * @param callback called when light did receive message
    */
-  setMultiZoneEffect(effectName: 'MOVE' | 'OFF', speed: number, direction: 'TOWARDS' | 'AWAY', callback?: () => void);
+  colorZones(startIndex: number, endIndex: number, hue: number, saturation: number, brightness: number, kelvin: number, duration: number, apply: boolean, callback: (err: Error, msg: any, rinfo: RemoteInfo) => void): void;
+
+  /**
+   * Requests ambient light value of the light
+   * @param callback a function to accept the data
+   */
+  getAmbientLight(callback: (err: Error, flux: number) => void): void;
+
+  /**
+  * Requests the current color zone state of the light
+  * @param startIndex start color zone index
+  * @param endIndex end color zone index
+  * @param callback a function to accept the data
+  */
+  getColorZones(startIndex: number, endIndex: number, callback: (err: Error, msg: { count: number, index: number, color: LightColor }, sequence: number) => void): void;
+
+  /**
+  * Requests used version from the microcontroller unit of the light
+  * @param callback a function to accept the data
+  */
+  getFirmwareVersion(callback: (err: Error, msg: {majorVersion: number, minorVersion: number}) => void): void;
+
+  /**
+  * Requests hardware info from the light
+  * @param callback a function to accept the data with error and message as parameters
+  */
+  getHardwareVersion(callback: (err: Error, msg: Product | false) => void): void;
+
+  /**
+  * Requests the label of the light
+  * @param callback a function to accept the data
+  * @param cache return cached result if exists
+  */
+  getLabel(callback: (err: Error, label: string) => void, cache: boolean): void;
+
+  /**
+  * Requests the current maximum setting for the infrared channel
+  * @param callback a function to accept the data
+  */
+  getMaxIR(callback: (err: Error, brightness: number) => void): void;
+
+  /**
+  * Requests the power level of the light
+  * @param callback a function to accept the data
+  */
+  getPower(callback: (err: Error, level: number) => void): void;
+
+  /**
+  * Requests the current state of the light
+  * @param callback a function to accept the data
+  */
+  getState(callback: (err: Error, state: {color: LightColor, power: number, label: string}) => void): void;
+
+  /**
+  * Requests uptime from the light (in nanoseconds)
+  * @param callback a function to accept the data with error and message as parameters
+  */
+  getUptime(callback: (err: Error, uptime: number) => void): void;
+
+  /**
+  * Requests wifi infos from for the light
+  * @param callback a function to accept the data
+  */
+  getWifiInfo(callback: (err: Error, info: {signal: number, tx: number, rx: number}) => void): void;
+
+  /**
+  * Requests used version from the wifi controller unit of the light (wifi firmware version)
+  * @param callback a function to accept the data
+  */
+  getWifiVersion(callback: (err: Error, version: { majorVersion: number, minorVersion: number}) => void): void;
+
+  /**
+  * Sets the Maximum Infrared brightness
+  * @param brightness infrared brightness from 0 - 100 (in %)
+  * @param callback called when light did receive message
+  */
+  maxIR(brightness: number, callback: (err: Error) => void): void;
+
+  /**
+   * Changes a color zone range to the given HSBK value
+   * @param effectName sets the desired effect, currently available options are: MOVE, OFF
+   * @param speed sets duration of one cycle of the effect, the higher the value the slower the effect animation
+   * @param direction whether to animate from or towards the controller, available options are: TOWARDS, AWAY
+   * @param callback called when light did receive message
+   */
+  setMultiZoneEffect(effectName: 'MOVE' | 'OFF', speed: number, direction: 'TOWARDS' | 'AWAY', callback: (err: Error) => void): void;
 
   /**
   * Turns the light off
   * @example light('192.168.2.130').off()
-  * @param {Number} [duration] transition time in milliseconds
-  * @param {Function} [callback] called when light did receive message
+  * @param duration transition time in milliseconds
+  * @param callback called when light did receive message
   */
-  off(duration: any, callback: any): void;
+  off(duration: number, callback: (err: Error) => void): void;
 
   /**
   * Turns the light on
   * @example light('192.168.2.130').on()
-  * @param {Number} [duration] transition time in milliseconds
-  * @param {Function} [callback] called when light did receive message
+  * @param duration transition time in milliseconds
+  * @param callback called when light did receive message
   */
-  on(duration: any, callback: any): void;
+  on(duration: number, callback: (err: Error) => void): void;
 
   /**
   * Sets the label of light
   * @example light.setLabel('Kitchen')
-  * @param {String} label new label to be set, maximum 32 bytes
-  * @param {Function} [callback] called when light did receive message
+  * @param label new label to be set, maximum 32 bytes
+  * @param callback called when light did receive message
   */
-  setLabel(label: any, callback: any): void;
+  setLabel(label: string, callback: (err: Error) => void): void;
 
   /**
   * Reboots the light
-  * @param {Function} callback called when light did receive message
+  * @param callback called when light did receive message
   */
-  reboot(callback: any): void;
+  reboot(callback: (err: Error) => void): void;
 }
 
-export const constants: {
+export interface Product {
+  vendorName: string;
+  productName: string;
+  productFeatures: ProductFeatures;
+  productUpgrades: ProductUpgrade[];
+}
+
+export interface ProductFeatures {
+  hev: boolean;
+  color: boolean;
+  chain: boolean;
+  matrix: boolean;
+  relays: boolean;
+  buttons: boolean;
+  infrared: boolean;
+  multizone: boolean;
+  temperature_range: [number, number];
+  extended_multizone?: boolean;
+  min_ext_mz_firmware?: number;
+  min_ext_mz_firmware_components?: number[];
+}
+
+export interface ProductUpgrade {
+  major: number;
+  minor: number;
+  features: ProductFeatures;
+}
+
+export interface ColorValues {
+  hue: number;
+  saturation: number;
+}
+
+export class constants {
   ACK_REQUIRED_BIT: number;
   ADDRESSABLE_BIT: number;
   APPLICATION_REQUEST_VALUES: {
+    NO_APPLY: number;
     APPLY: number;
     APPLY_ONLY: number;
-    NO_APPLY: number;
   };
   COLOR_NAME_HS_VALUES: {
-    blue: {
-      hue: number;
-      saturation: number;
-    };
-    cyan: {
-      hue: number;
-      saturation: number;
-    };
-    green: {
-      hue: number;
-      saturation: number;
-    };
-    orange: {
-      hue: number;
-      saturation: number;
-    };
-    pink: {
-      hue: number;
-      saturation: number;
-    };
-    purple: {
-      hue: number;
-      saturation: number;
-    };
-    red: {
-      hue: number;
-      saturation: number;
-    };
-    white: {
-      hue: number;
-      saturation: number;
-    };
-    yellow: {
-      hue: number;
-      saturation: number;
-    };
+    white: ColorValues;
+    red: ColorValues;
+    orange: ColorValues;
+    yellow: ColorValues;
+    cyan: ColorValues;
+    green: ColorValues;
+    blue: ColorValues;
+    purple: ColorValues;
+    pink: ColorValues;
   };
   HSBK_DEFAULT_KELVIN: number;
   HSBK_MAXIMUM_BRIGHTNESS: number;
@@ -376,18 +337,10 @@ export const constants: {
   IR_MINIMUM_BRIGHTNESS: number;
   LIFX_ANY_PORT: number;
   LIFX_DEFAULT_PORT: number;
-  LIFX_PRODUCT_IDS: {
-    id: number;
-    name: string;
-  }[];
-  LIFX_VENDOR_IDS: {
-    id: number;
-    name: string;
-  }[];
   LIGHT_WAVEFORMS: string[];
-  ORIGIN_BITS: number;
   MULTIZONE_EFFECTS_MOVE_DIRECTION: string[];
   MULTIZONE_EFFECTS: string[];
+  ORIGIN_BITS: number;
   PACKET_HEADER_SEQUENCE_MAX: number;
   PACKET_HEADER_SIZE: number;
   PACKET_TRANSACTION_TYPES: {
@@ -403,137 +356,15 @@ export const constants: {
   TAGGED_BIT: number;
   ZONE_INDEX_MAXIMUM_VALUE: number;
   ZONE_INDEX_MINIMUM_VALUE: number;
-};
-
-export namespace packet {
-  const typeList: {
-    id: number;
-    name: string;
-  }[];
-
-  /**
-  * Creates a new packet by the given type
-  * Note: This does not validate the given params
-  * @param  {String|Number} type the type of packet to create as number or string
-  * @param  {Object} params further settings to pass
-  * @param  {String} [source] the source of the packet, length 8
-  * @param  {String} [target] the target of the packet, length 12
-  * @return {Object} The prepared packet object including header
-  */
-  function create(type: any, params: any, source: any, target: any): any;
-
-  /**
-  * Creates a lifx packet header from a given object
-  * @param {Object} obj Object containg header configuration for packet
-  * @return {Buffer} packet header buffer
-  */
-  function headerToBuffer(obj: any): any;
-
-  /**
-  * Parses a lifx packet header
-  * @param {Buffer} buf Buffer containg lifx packet including header
-  * @return {Object} parsed packet header
-  */
-  function headerToObject(buf: any): any;
-
-  /**
-  * Creates a packet from a configuration object
-  * @param {Object} obj Object with configuration for packet
-  * @return {Buffer|Boolean} the packet or false in case of error
-  */
-  function toBuffer(obj: any): any;
-
-  /**
-  * Parses a lifx packet
-  * @param {Buffer} buf Buffer with lifx packet
-  * @return {Object} parsed packet
-  */
-  function toObject(buf: any): any;
 }
 
-export namespace utils {
+export interface utils {
   /**
   * Get's product and vendor details for the given id's
   * hsb integer object
-  * @param {Number} vendorId id of the vendor
-  * @param {Number} productId id of the product
-  * @return {Object|Boolean} product and details vendor details or false if not found
+  * @param vendorId id of the vendor
+  * @param productId id of the product
+  * @return product and details vendor details or false if not found
   */
-  function getHardwareDetails(vendorId: number, productId: number): Object | boolean;
-
-  /**
-  * Return all ip addresses of the machine
-  * @return {Array} list containing ip address info
-  */
-  function getHostIPs(): Array<any>;
-
-  /**
-  * Generates a random hex string of the given length
-  * @example
-  * // returns something like 8AF1
-  * utils.getRandomHexString(4)
-  * @example
-  * // returns something like 0D41C8AF
-  * utils.getRandomHexString()
-  * @param  {Number} [length=8] string length to generate
-  * @return {String}            random hex string
-  */
-  function getRandomHexString(length?: number): string;
-
-  /**
-  * Validates a given ip address is IPv4 format
-  * @param  {String} ip IP address to validate
-  * @return {Boolean}   is IPv4 format?
-  */
-  function isIpv4Format(ip: string): boolean;
-
-  function maxNumberInArray(array: Array<number>): Array<number>;
-  function minNumberInArray(array: Array<number>): Array<number>;
-
-  /**
-  * Reads a little-endian unsigned 64-bit value and returns it as buffer
-  * This function exists for easy replacing if a native method will be provided
-  * by node.js and does not make sense like is
-  * @param  {Buffer} buffer buffer to read from
-  * @param  {Number} offset offset to begin reading from
-  * @return {Buffer}        resulting 64-bit buffer
-  */
-  function readUInt64LE(buffer: Buffer, offset: number): Buffer;
-
-  /**
-  * Converts an RGB Hex string to an object with decimal representations
-  * @example rgbHexStringToObject('#FF00FF')
-  * @param {String} rgbHexString hex value to parse, with leading #
-  * @return {Object}             object with decimal values for r, g, b
-  */
-  function rgbHexStringToObject(rgbHexString: string): Object;
-
-  /**
-  * Converts an object with r,g,b integer values to an
-  * hsb integer object
-  * @param {Object} rgbObj object with r,g,b keys and values
-  * @return {Object} hsbObj object with h,s,b keys and converted values
-  */
-  function rgbToHsb(rgbObj: Object): Object;
-
-  /**
-  * Writes a 64-bit value provided as buffer and returns the result
-  * This function exists for easy replacing if a native method will be provided
-  * by node.js and does not make sense like is
-  * @param  {Buffer} buffer buffer to write from
-  * @param  {Number} offset offset to begin reading from
-  * @param  {Buffer} input  the buffer to write
-  * @return {Buffer}        resulting 64-bit buffer
-  */
-  function writeUInt64LE(buffer: Buffer, offset: number, input: Buffer): Buffer;
-}
-
-export namespace validate {
-  function callback(callback: any, context: any): void;
-  function colorHsb(hue: any, saturation: any, brightness: any, context: any): void;
-  function colorRgb(red: any, green: any, blue: any, context: any): void;
-  function irBrightness(brightness: any, context: any): void;
-  function optionalCallback(callback: any, context: any): void;
-  function optionalDuration(duration: any, context: any): void;
-  function zoneIndex(index: any, context: any): void;
+  getHardwareDetails(vendorId: number, productId: number): Product | false;
 }
