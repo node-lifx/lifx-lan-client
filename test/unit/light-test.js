@@ -38,6 +38,7 @@ describe('Light', () => {
     effectName: 'MOVE',
     speed: 1000,
     direction: 'TOWARDS',
+    relayIndex: 0,
     callback: () => {}
   };
 
@@ -48,7 +49,8 @@ describe('Light', () => {
     brightness: 0,
     // the value was changed in constants before
     kelvin: constant.HSBK_MINIMUM_KELVIN,
-    zoneIndex: 0
+    zoneIndex: 0,
+    relayIndex: 0
   };
 
   // Maximum valid values
@@ -57,7 +59,8 @@ describe('Light', () => {
     saturation: 100,
     brightness: 100,
     kelvin: constant.HSBK_MAXIMUM_KELVIN,
-    zoneIndex: 255
+    zoneIndex: 255,
+    relayIndex: 3
   };
 
   beforeEach(() => {
@@ -750,5 +753,137 @@ describe('Light', () => {
     bulb.setMultiZoneEffect('MOVE', 1000, 'TOWARDS', () => {});
     assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
     assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
+  });
+
+  it('getting relay values', () => {
+    const currMsgQueCnt = getMsgQueueLength();
+    // eslint-disable-next-line prefer-const
+    let currHandlerCnt = getMsgHandlerLength();
+
+    // Error cases
+    assert.throw(() => {
+      // No arguments
+      bulb.getRelayPower();
+    }, TypeError);
+
+    assert.throw(() => {
+      // Too few arguments
+      bulb.getRelayPower(0);
+    }, TypeError);
+
+    assert.throw(() => {
+      bulb.getRelayPower(not.number, valid.callback);
+    }, TypeError);
+
+    assert.throw(() => {
+      bulb.getRelayPower(valid.relayIndex, not.func);
+    }, TypeError);
+
+    assert.throw(() => {
+      bulb.getRelayPower(min.relayIndex - 1, valid.callback);
+    }, RangeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.getRelayPower(max.relayIndex + 1, valid.callback);
+    }, RangeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    bulb.getRelayPower(valid.relayIndex, () => {});
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
+  });
+
+  it('turning a relay on', () => {
+    let currMsgQueCnt = getMsgQueueLength();
+    let currHandlerCnt = getMsgHandlerLength();
+    bulb.relayOn(0);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    currMsgQueCnt += 1;
+
+    assert.throw(() => {
+      bulb.relayOn('0');
+    }, TypeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.relayOn(min.relayIndex - 1);
+    }, RangeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.relayOn(max.relayIndex + 1);
+    }, RangeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.relayOn(0, []);
+    }, TypeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+    assert.equal(getMsgHandlerLength(), currHandlerCnt, 'no handler added');
+
+    bulb.relayOn(0, () => {});
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    currMsgQueCnt += 1;
+    assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
+    currHandlerCnt += 1;
+  });
+
+  it('turning a relay off', () => {
+    let currMsgQueCnt = getMsgQueueLength();
+    let currHandlerCnt = getMsgHandlerLength();
+
+    bulb.relayOff(0);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    currMsgQueCnt += 1;
+
+    assert.throw(() => {
+      bulb.relayOff('0');
+    }, TypeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.relayOff(min.relayIndex - 1);
+    }, RangeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.relayOff(max.relayIndex + 1);
+    }, RangeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.relayOff(0, []);
+    }, TypeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+    assert.equal(getMsgHandlerLength(), currHandlerCnt, 'no handler added');
+
+    bulb.relayOff(0, () => {});
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    currMsgQueCnt += 1;
+    assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
+    currHandlerCnt += 1;
+  });
+
+  it('does the light have relays', () => {
+    let currMsgQueCnt = getMsgQueueLength();
+    let currHandlerCnt = getMsgHandlerLength();
+
+    assert.throw(() => {
+      bulb.hasRelays();
+    }, TypeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+
+    assert.throw(() => {
+      bulb.hasRelays([]);
+    }, TypeError);
+    assert.equal(getMsgQueueLength(), currMsgQueCnt, 'no package added to the queue');
+    assert.equal(getMsgHandlerLength(), currHandlerCnt, 'no handler added');
+
+    bulb.hasRelays(() => {});
+    assert.equal(getMsgQueueLength(), currMsgQueCnt + 1, 'sends a packet to the queue');
+    currMsgQueCnt += 1;
+    assert.equal(getMsgHandlerLength(), currHandlerCnt + 1, 'adds a handler');
+    currHandlerCnt += 1;
   });
 });

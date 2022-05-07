@@ -203,6 +203,21 @@ validate.optionalZoneIndex = function(index, context) {
 };
 
 /**
+ * Checks validity of a relay index
+ * @param {any} index Light relay index to validate
+ * @param {String} context validation context
+ */
+validate.relayIndex = function(index, context) {
+  const relayMessage = 'LIFX %s expects zone to be a number between ' +
+    constants.RELAY_INDEX_MINIMUM_VALUE + ' and ' + constants.RELAY_INDEX_MAXIMUM_VALUE;
+  if (typeof index !== 'number') {
+    throwTypeError(relayMessage, context);
+  } else if (index < constants.RELAY_INDEX_MINIMUM_VALUE || index > constants.RELAY_INDEX_MAXIMUM_VALUE) {
+    throwRangeError(relayMessage, context);
+  }
+};
+
+/**
  * test if the given value is an uint value
  * @param {Number} val the given uint value as number
  * @param {String} context the string for the error message

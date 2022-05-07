@@ -604,4 +604,74 @@ Light.prototype.setMultiZoneEffect = function(effectName, speed, direction, call
   this.client.send(packetObj, callback);
 };
 
+/**
+ * Turns the relay off
+ * @example light('192.168.2.130').relayOff(0)
+ * @param {Number} [relayIndex] transition time in milliseconds
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.relayOff = function(relayIndex, callback) {
+  validate.relayIndex(relayIndex, 'relay off method');
+  validate.optionalCallback(callback, 'relay off method');
+
+  const packetObj = packet.create('setRelayPower', {relayLevel: 0, relayIndex: relayIndex}, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/**
+ * Turns the relay on
+ * @example light('192.168.2.130').relayOn(0)
+ * @param {Number} [relayIndex] transition time in milliseconds
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.relayOn = function(relayIndex, callback) {
+  validate.relayIndex(relayIndex, 'relay on method');
+  validate.optionalCallback(callback, 'relay on method');
+
+  const packetObj = packet.create('setRelayPower', {relayLevel: 65535, relayIndex: relayIndex}, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/**
+ * Requests the power level of the relay
+ * @param {Number} relayIndex the index of the relay on the switch (0-3)
+ * @param {Function} callback a function to accept the data
+ */
+Light.prototype.getRelayPower = function(relayIndex, callback) {
+  validate.relayIndex(relayIndex, 'light on method');
+  validate.callback(callback, 'light getRelayPower method');
+
+  const packetObj = packet.create('getRelayPower', {relayIndex: relayIndex}, this.client.source);
+  packetObj.target = this.id;
+  const sqnNumber = this.client.send(packetObj);
+  this.client.addMessageHandler('stateRelayPower', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    if (msg.relayLevel === 65535) {
+      msg.relayLevel = 1;
+    }
+    return callback(null, msg.relayLevel);
+  }, sqnNumber);
+};
+
+/**
+ * Does the light have relays (is it a switch)
+ * @example light('192.168.2.130').hasRelays()
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.hasRelays = function(callback) {
+  validate.callback(callback, 'light hasRelays method');
+
+  this.getHardwareVersion(function(error, data) {
+    if (error) {
+      return callback(null);
+    }
+
+    return callback(data && data.productFeatures && data.productFeatures.relays);
+  });
+};
+
 exports.Light = Light;
