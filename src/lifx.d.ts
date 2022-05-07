@@ -312,6 +312,37 @@ export class Light {
   * @param {Function} callback called when light did receive message
   */
   reboot(callback: any): void;
+
+  /**
+   * Turns the relay off
+   * @example light('192.168.2.130').relayOff(0)
+   * @param {Number} [relayIndex] index of the relay
+   * @param {Function} [callback] called when relay did receive message
+   */
+  relayOff(relayIndex: any, callback: any): void;
+
+  /**
+   * Turns the relay on
+   * @example light('192.168.2.130').relayOn(0)
+   * @param {Number} [relayIndex] index of the relay
+   * @param {Function} [callback] called when relay did receive message
+   */
+  relayOn(relayIndex: any, callback: any): void;
+
+  /**
+   * Get the relay power
+   * @example light('192.168.2.130').getRelayPower(0)
+   * @param {Number} [relayIndex] index of the relay
+   * @param {Function} [callback] called when relay did receive message
+   */
+  getRelayPower(relayIndex: any, callback: any): void;
+
+  /**
+   * Does the light have relays (is it a switch)
+   * @example light('192.168.2.130').hasRelays()
+   * @param {Function} [callback] called when light did receive message
+   */
+  hasRelays(callback: any): void;
 }
 
 export const constants: {
@@ -400,6 +431,8 @@ export const constants: {
   TAGGED_BIT: number;
   ZONE_INDEX_MAXIMUM_VALUE: number;
   ZONE_INDEX_MINIMUM_VALUE: number;
+  RELAY_INDEX_MAXIMUM_VALUE: number;
+  RELAY_INDEX_MINIMUM_VALUE: number;
 };
 
 export namespace packet {
@@ -533,4 +566,5 @@ export namespace validate {
   function optionalCallback(callback: any, context: any): void;
   function optionalDuration(duration: any, context: any): void;
   function zoneIndex(index: any, context: any): void;
+  function relayIndex(index: any, context: any): void;
 }

@@ -46,6 +46,10 @@ module.exports = {
   ZONE_INDEX_MINIMUM_VALUE: 0,
   ZONE_INDEX_MAXIMUM_VALUE: 255,
 
+  // Relay device relay index value
+  RELAY_INDEX_MINIMUM_VALUE: 0,
+  RELAY_INDEX_MAXIMUM_VALUE: 3,
+
   // Waveform values, order is important here
   LIGHT_WAVEFORMS: [
     'SAW',
