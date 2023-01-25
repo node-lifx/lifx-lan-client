@@ -1,12 +1,6 @@
 # LIFX LAN Node.js Library
 
 [![NPM Version](https://img.shields.io/npm/v/lifx-lan-client.svg)](https://www.npmjs.com/package/lifx-lan-client)
-[![Build Status](https://img.shields.io/travis/MariusRumpf/lifx-lan-client/master.svg)](https://travis-ci.org/MariusRumpf/lifx-lan-client)
-[![Build status](https://img.shields.io/appveyor/ci/MariusRumpf/lifx-lan-client/master.svg)](https://ci.appveyor.com/project/MariusRumpf/lifx-lan-client)
-[![Dependency Status](https://dependencyci.com/github/MariusRumpf/lifx-lan-client/badge)](https://dependencyci.com/github/MariusRumpf/lifx-lan-client)
-[![codecov.io](https://img.shields.io/codecov/c/github/MariusRumpf/lifx-lan-client/master.svg)](https://codecov.io/github/MariusRumpf/lifx-lan-client?branch=master)
-[![Gitter Chat](https://img.shields.io/gitter/room/lifx-lan-client/Lobby.svg)](https://gitter.im/lifx-lan-client/Lobby)
-
 
 A Node.js implementation of the [LIFX protocol](https://github.com/LIFX/lifx-protocol-docs). Developed to work with a minimum firmware version of 2.0.
 
