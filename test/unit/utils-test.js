@@ -132,11 +132,12 @@ describe('Utils', () => {
     hardwareId = 1;
     assert.deepEqual(utils.getHardwareDetails(vendorId, hardwareId), {
       vendorName: 'LIFX',
-      productName: 'Original 1000',
+      productName: 'LIFX Original 1000',
       productFeatures: {
         chain: false,
         color: true,
         infrared: false,
+        matrix: false,
         multizone: false,
         ['temperature_range']: [2500, 9000]
       }
@@ -145,11 +146,12 @@ describe('Utils', () => {
     hardwareId = 10;
     assert.deepEqual(utils.getHardwareDetails(vendorId, hardwareId), {
       vendorName: 'LIFX',
-      productName: 'White 800 (Low Voltage)',
+      productName: 'LIFX White 800 (Low Voltage)',
       productFeatures: {
         chain: false,
         color: false,
         infrared: false,
+        matrix: false,
         multizone: false,
         ['temperature_range']: [2700, 6500]
       }

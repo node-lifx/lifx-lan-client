@@ -1,6 +1,6 @@
 'use strict';
 
-const tile = require('../../../lib/lifx/packets').tile;
+const tile = require('../../../src/lifx/packets').tile;
 const assert = require('chai').assert;
 const buildTile = require('./buildTile');
 

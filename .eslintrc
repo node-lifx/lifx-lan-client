@@ -1,8 +1,13 @@
 {
   "env": {
+    "es6": true,
     "node": true
   },
-  "parser": "babel-eslint",
+  "extends": "eslint:recommended",
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
   "parserOptions": {
     "ecmaVersion": 2015,
     "sourceType": "module"
@@ -95,7 +100,7 @@
     "no-useless-call": 2,
     "no-useless-concat": 2,
     "no-void": 2,
-    "no-warning-comments": 1,
+    "no-warning-comments": 0,
     "no-with": 2,
     "radix": 2,
     "wrap-iife": [2, "inside"],
@@ -156,5 +161,23 @@
     "prefer-const": 2,
     "no-var": 2,
     "arrow-parens": 2
+  },
+  "plugins": ["@typescript-eslint"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ]
+    },
+    {
+      "files": ["*.d.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/no-unused-vars": 0
+      }
     }
+  ]
 }

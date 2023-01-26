@@ -1,6 +1,6 @@
 'use strict';
 
-const hsbk = require('../../../lib/lifx/packets').hsbk;
+const hsbk = require('../../../src/lifx/packets').hsbk;
 const assert = require('chai').assert;
 
 describe('hsbk', () => {

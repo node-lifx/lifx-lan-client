@@ -1,7 +1,7 @@
 'use strict';
 
 const {packet, constants, validate, utils} = require('../lifx');
-const {assign, pick} = require('lodash');
+const {assign, pick, includes, isNumber} = require('lodash');
 
 /**
  * A representation of a light bulb
@@ -148,6 +148,52 @@ Light.prototype.maxIR = function(brightness, callback) {
 };
 
 /**
+ * Apply a waveform effect to the bulb.
+ * @param {Number} hue        color hue from 0 - 360 (in °)
+ * @param {Number} saturation color saturation from 0 - 100 (in %)
+ * @param {Number} brightness color brightness from 0 - 100 (in %)
+ * @param {Number} [kelvin=3500]   color kelvin between 2500 and 9000
+ * @param {Boolean} [transient=false] color does not persist
+ * @param {Number} [period=500] duration of a cycle in miliseconds
+ * @param {Number} [cycles=10e30] number of cycles
+ * @param {Number} [skewRatio=0.5] waveform skew, between 0 and 1
+ * @param {Number} [waveform=0] waveform to use for transition
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.waveform = function(hue, saturation, brightness, kelvin, transient = false, period = 500, cycles = 10e30, skewRatio = 0.5, waveform = 0, callback) {
+  validate.colorHsb(hue, saturation, brightness, 'light waveform method');
+
+  validate.optionalKelvin(kelvin, 'light waveform method');
+  validate.optionalBoolean(transient, 'transient', 'light waveform method');
+  validate.optionalNumber(period, 'period', 'light waveform method');
+  validate.optionalNumber(cycles, 'cycles', 'light waveform method');
+  validate.optionalNumber(skewRatio, 'skewRatio', 'light waveform method');
+  validate.optionalWaveform(waveform, 'light waveform method');
+  validate.optionalCallback(callback, 'light waveform method');
+
+  // Convert HSB values to packet format
+  hue = Math.round(hue / constants.HSBK_MAXIMUM_HUE * 65535);
+  saturation = Math.round(saturation / constants.HSBK_MAXIMUM_SATURATION * 65535);
+  brightness = Math.round(brightness / constants.HSBK_MAXIMUM_BRIGHTNESS * 65535);
+
+  const packetObj = packet.create('setWaveform', {
+    color: {
+      hue: hue,
+      saturation: saturation,
+      brightness: brightness,
+      kelvin: kelvin
+    },
+    isTransient: transient,
+    period,
+    cycles,
+    skewRatio: (skewRatio * 65535) - 32768,
+    waveform
+  }, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/**
  * Requests the current state of the light
  * @param {Function} callback a function to accept the data
  */
@@ -186,6 +232,7 @@ Light.prototype.getMaxIR = function(callback) {
 
   const packetObj = packet.create('getInfrared', {}, this.client.source);
   packetObj.target = this.id;
+  packetObj.resRequired = true;
   const sqnNumber = this.client.send(packetObj);
   this.client.addMessageHandler('stateInfrared', function(err, msg) {
     if (err) {
@@ -642,6 +689,34 @@ Light.prototype.setTileState64 = function(tileIndex, colors, optionsOrCallback, 
     Object.assign(defaultOptionsTileState64(options), {
       colors: utils.buildColorsHsbk(colors, 64)
     }), this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/*
+ * Changes a color zone range to the given HSBK value
+ * @param {String} effectName sets the desired effect, currently available options are: MOVE, OFF
+ * @param {Number} speed sets duration of one cycle of the effect, the higher the value the slower the effect animation
+ * @param {String} direction whether to animate from or towards the controller, available options are: TOWARDS, AWAY
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.setMultiZoneEffect = function(effectName, speed, direction, callback) {
+  if (!includes(constants.MULTIZONE_EFFECTS, effectName)) {
+    throw new TypeError('light.setMultiZoneEffect expects effectName to be one of "MOVE" or "OFF"');
+  }
+  if (!isNumber(speed)) {
+    throw new TypeError('light.setMultiZoneEffect expects speed to be a number');
+  }
+  if (!includes(constants.MULTIZONE_EFFECTS_MOVE_DIRECTION, direction)) {
+    throw new TypeError('light.setMultiZoneEffect expects direction to be one of "TOWARDS" or "AWAY"');
+  }
+  validate.optionalCallback(callback, 'light.setMultiZoneEffect');
+
+  const packetObj = packet.create('setMultiZoneEffect', {
+    effectType: constants.MULTIZONE_EFFECTS.indexOf(effectName),
+    speed: speed,
+    parameter2: constants.MULTIZONE_EFFECTS_MOVE_DIRECTION.indexOf(direction)
+  }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };

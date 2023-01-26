@@ -1,33 +1,29 @@
 {
   "name": "lifx-lan-client",
   "description": "Node.js implementation of the LIFX LAN protocol",
-  "version": "1.0.2",
+  "version": "2.0.1",
   "author": "Marius Rumpf <marius@mariusrumpf.de>",
   "bugs": {
     "url": "https://github.com/node-lifx/lifx-lan-client/issues"
   },
   "dependencies": {
-    "eventemitter3": "^2.0.3",
+    "eventemitter3": "^4.0.7",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^10.0.3",
-    "babel-preset-env": "^1.7.0",
-    "chai": "^4.2.0",
-    "codecov.io": "^0.1.6",
-    "eslint": "^5.16.0",
-    "istanbul": "^0.4.0",
-    "lolex": "^1.6.0",
-    "mkdirp": "^0.5.1",
-    "mocha": "^6.2.0",
-    "rimraf": "^2.7.1",
-    "sinon": "^4.5.0"
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "chai": "^4.3.6",
+    "codecov": "^3.8.3",
+    "eslint": "^8.14.0",
+    "mocha": "^9.2.2",
+    "nyc": "^15.1.0",
+    "sinon": "^13.0.2",
+    "typescript": "^4.6.3"
   },
   "directories": {
     "test": "test",
-    "lib": "lib",
+    "lib": "src",
     "example": "example"
   },
   "homepage": "https://github.com/node-lifx/lifx-lan-client#readme",
@@ -39,27 +35,27 @@
     "lightbulb"
   ],
   "license": "MIT",
-  "main": "./lib/lifx",
-  "types": "./lib/lifx.d.ts",
+  "main": "./src/lifx",
+  "types": "./src/lifx.d.ts",
   "engines": {
-    "node": ">=4"
+    "node": ">=8.10"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/node-lifx/lifx-lan-client.git"
   },
   "scripts": {
-    "prepare": "npm run build",
-    "prebuild": "npm run clean && mkdirp lib/lifx && cp src/lifx/products.json lib/lifx",
-    "build": "npm run prebuild && babel src --out-dir lib",
-    "build:watch": "npm run build -- --watch",
-    "clean": "rimraf lib",
     "lint": "eslint src/ test/ example/ cli.js",
     "lint:fix": "npm run lint -- --fix",
-    "pretest": "npm run lint && npm run build",
-    "unittest": "mocha -u bdd -r babelhook --recursive test/unit/ || true",
-    "unittest:bail": "mocha -u bdd -r babelhook --recursive test/unit/ --bail || true",
-    "test": "istanbul cover -root lib/ node_modules/mocha/bin/_mocha -- -u bdd -r babelhook --recursive test/unit/",
-    "report-coverage": "cat ./coverage/coverage.json | node_modules/codecov.io/bin/codecov.io.js"
+    "pretest": "npm run lint",
+    "unittest": "mocha || true",
+    "unittest:bail": "mocha --bail || true",
+    "test": "nyc --reporter=lcov mocha",
+    "report-coverage": "codecov"
+  },
+  "mocha": {
+    "ui": "bdd",
+    "recursive": true,
+    "spec": "test/unit/"
   }
 }

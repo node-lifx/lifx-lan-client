@@ -1,6 +1,6 @@
 'use strict';
 
-const Packet = require('../../../lib/lifx').packet;
+const Packet = require('../../../src/lifx').packet;
 const assert = require('chai').assert;
 
 describe('Packet setTileState64', () => {

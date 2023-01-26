@@ -1,6 +1,2 @@
-appveyor.yml
-babelhook.js
 jsconfig.json
-src
 test
-

@@ -55,6 +55,17 @@ module.exports = {
     'PULSE'
   ],
 
+  // Multizone Effect Modes, order is important here
+  MULTIZONE_EFFECTS: [
+    'OFF',
+    'MOVE'
+  ],
+  // Dirction of a speed effect, indicating whether to go towards or away from the controller, order is important here
+  MULTIZONE_EFFECTS_MOVE_DIRECTION: [
+    'TOWARDS',
+    'AWAY'
+  ],
+
   // Packet types used by internal sending process
   PACKET_TRANSACTION_TYPES: {
     ONE_WAY: 0,
