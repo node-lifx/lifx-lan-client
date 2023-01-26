@@ -2,6 +2,7 @@
 
 const {constants} = require('../lifx');
 const {format} = require('util');
+
 const validate = exports;
 
 /**
@@ -203,6 +204,20 @@ validate.optionalZoneIndex = function(index, context) {
 };
 
 /**
+ * Checks validity the userX and userY
+ * @param {Number} x the x value
+ * @param {Number} y the y value
+ * @param {String} context validation context
+ * @param {String} valueName prepended to the output
+ * @return {Boolean} const true or an exception
+ */
+validate.isXY = function(x, y, context, valueName) {
+  validate.isUInt8(x, context, (valueName || '') + 'X');
+  validate.isUInt8(y, context, (valueName || '') + 'Y');
+  return true;
+};
+
+/**
  * test if the given value is an uint value
  * @param {Number} val the given uint value as number
  * @param {String} context the string for the error message
@@ -247,6 +262,39 @@ validate.isUInt16 = function(val, context) {
  */
 validate.isUInt32 = function(val, context) {
   return validate.isUIntRange(val, context, 0xffffffff);
+};
+
+/**
+ * @typedef {Object} UInt64LowHigh
+ * @property {Number} low - UInt16 accelMeasX
+ * @property {Number} high - UInt16 accelMeasX
+ */
+/**
+ * test if the given value is an uint32 value
+ * @param {UInt64LowHigh} val the given uint64 as low,high object
+ * @param {String} context the string for the error message
+ * @return {Boolean} const true or an exception
+ */
+validate.isUInt64LowHigh = function(val, context) {
+  if (typeof val !== 'object') {
+    throwTypeError('LIFX %s expects "%s" to be an object', context, val);
+  }
+  validate.isUInt32(val.low, context);
+  validate.isUInt32(val.high, context);
+  return true;
+};
+
+/**
+ * test if the given value is an float value
+ * @param {Number} val the given float value as number
+ * @param {String} context the string for the error message
+ * @return {Boolean} const true or an exception
+ */
+validate.isFloat = function(val, context) {
+  if (typeof val !== 'number') {
+    throwTypeError('LIFX %s expects "%s" to be a float', context, val);
+  }
+  return true;
 };
 
 /**

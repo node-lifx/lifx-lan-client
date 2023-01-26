@@ -577,6 +577,123 @@ Light.prototype.colorZones = function(startIndex, endIndex, hue, saturation, bri
 };
 
 /**
+ * Requests tile getDeviceChain 701
+ * @param {Function} callback a function to accept the data
+ */
+Light.prototype.getDeviceChain = function(callback) {
+  validate.callback(callback, 'light getDeviceChain method');
+
+  const packetObj = packet.create('getDeviceChain', {}, this.client.source);
+  packetObj.target = this.id;
+  const sqnNumber = this.client.send(packetObj);
+  this.client.addMessageHandler('stateDeviceChain', callback, sqnNumber);
+};
+
+/**
+ * Sets Tile Position
+ * @param {SetUserPosition} vals - value to set
+ * @param {Function} callback called when light did receive message
+ */
+Light.prototype.setUserPosition = function(vals, callback) {
+  vals = Object.assign({
+    tileIndex: 0,
+    userX: 0,
+    userY: 0,
+    reserved: 0
+  }, vals);
+  validate.isUInt8(vals.tileIndex, 'setUserPosition', 'tileIndex');
+  validate.isFloat(vals.userX, 'setUserPosition', 'userX');
+  validate.isFloat(vals.userY, 'setUserPosition', 'userX');
+  validate.isUInt16(vals.reserved || 0, 'setUserPosition', 'reserved');
+  validate.optionalCallback(callback, 'light setUserPosition method');
+  if (typeof callback !== 'function') {
+    callback = () => {};
+  }
+
+  const packetObj = packet.create('setUserPosition', vals, this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+function defaultOptionsTileState64(options) {
+  const ret = Object.assign({
+    tileIndex: 0,
+    length: 64,
+    width: 8,
+    x: 0,
+    y: 0,
+    duration: 0,
+    reserved: 0
+  }, options);
+  validate.isUInt8(ret.tileIndex, 'TileState64:tileIndex');
+  validate.isUInt8(ret.length, 'TileState64:length');
+  validate.isUInt8(ret.width, 'TileState64:width');
+  validate.isUInt8(ret.x, 'TileState64:x');
+  validate.isUInt8(ret.y, 'TileState64:y');
+  validate.isUInt32(ret.duration, 'TileState64:duration');
+  validate.isUInt8(ret.reserved, 'TileState64:length');
+  return ret;
+}
+
+/**
+ * Requests tile GetTileState64 707
+ *
+ * Get the state of 64 pixels in the tile in a rectangle that has
+ * a starting point and width.
+ * The tileIndex is used to control the starting tile in the chain
+ * and length is used to get the state of that many tiles beginning
+ * from the tileIndex. This will result in a separate response from
+ * each tile.
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {GetTileState64} optionsOrCallback - tileState ignore tileIndex
+ * @param {Function} callback a function to accept the data
+ */
+Light.prototype.getTileState64 = function(tileIndex, optionsOrCallback, callback) {
+  const options = {tileIndex};
+  if (typeof optionsOrCallback === 'function') {
+    callback = optionsOrCallback;
+  } else {
+    Object.assign(options, optionsOrCallback);
+  }
+  validate.callback(callback, 'light getTileState64 method');
+  const packetObj = packet.create('getTileState64',
+    defaultOptionsTileState64(options), this.client.source);
+  packetObj.target = this.id;
+  const sqnNumber = this.client.send(packetObj);
+  this.client.addMessageHandler('stateTileState64', callback, sqnNumber);
+};
+
+/**
+ * This lets you set 64 pixels from a starting x and y for
+ * a rectangle with the specified width.
+ * For the LIFX Tile it really only makes sense to set x
+ * and y to zero, and width to 8.
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {Number} colors[64]	64 HSBK values
+ * @param {GetTileState64} optionsOrCallback - tileState ignore tileIndex
+ * @param {Function} [callback] called when light did receive message
+ */
+Light.prototype.setTileState64 = function(tileIndex, colors, optionsOrCallback, callback) {
+  validate.isUInt8(tileIndex, 'setTileState64', 'tileIndex');
+  const options = {tileIndex};
+  if (typeof optionsOrCallback === 'function') {
+    callback = optionsOrCallback;
+  } else {
+    Object.assign(options, optionsOrCallback);
+  }
+  validate.optionalCallback(callback, 'light setTileState64 method');
+  if (typeof callback !== 'function') {
+    callback = () => {};
+  }
+  const packetObj = packet.create('setTileState64',
+    Object.assign(defaultOptionsTileState64(options), {
+      colors: utils.buildColorsHsbk(colors, 64)
+    }), this.client.source);
+  packetObj.target = this.id;
+  this.client.send(packetObj, callback);
+};
+
+/*
  * Changes a color zone range to the given HSBK value
  * @param {String} effectName sets the desired effect, currently available options are: MOVE, OFF
  * @param {Number} speed sets duration of one cycle of the effect, the higher the value the slower the effect animation

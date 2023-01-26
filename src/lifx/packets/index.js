@@ -80,3 +80,13 @@ packets.setColorZones = require('./setColorZones');
 
 packets.stateZone = require('./stateZone');
 packets.stateMultiZone = require('./stateMultiZone');
+
+packets.tile = require('./tile');
+packets.hsbk = require('./hsbk');
+packets.getDeviceChain = require('./getDeviceChain');
+packets.stateDeviceChain = require('./stateDeviceChain');
+
+packets.setUserPosition = require('./setUserPosition');
+packets.setTileState64 = require('./setTileState64');
+packets.getTileState64 = require('./getTileState64');
+packets.stateTileState64 = require('./stateTileState64');
