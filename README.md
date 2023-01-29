@@ -354,12 +354,12 @@ Example result:
 true
 ```
 
-#### `light.getRelayPower(i, callback)`
+#### `light.getRelayPower(relayIndex, callback)`
 Gets the value of the relay at zero-based index i (0-3). This function is asynchronous.
 
 Option | Type | Default | Description
 ------ | ---- | ------- | -----------
-`i` | int | | The zero-based index of the relay (from 0 to 3)
+`relayIndex` | int | | The zero-based index of the relay (from 0 to 3)
 `callback` | function | | `function(error, level) {}`
 
 
@@ -369,12 +369,12 @@ null,
 65535
 ```
 
-#### `light.relayOn(i, callback)`
+#### `light.relayOn(relayIndex, callback)`
 Turns the relay on. This function is asynchronous.
 
 Option | Type | Default | Description
 ------ | ---- | ------- | -----------
-`i` | int | | The zero-based index of the relay (from 0 to 3)
+`relayIndex` | int | | The zero-based index of the relay (from 0 to 3)
 `callback` | function | | `function(error, data) {}`
 
 
@@ -384,12 +384,12 @@ null,
 65535
 ```
 
-#### `light.relayOff(i, callback)`
+#### `light.relayOff(relayIndex, callback)`
 Turns the relay off. This function is asynchronous.
 
 Option | Type | Default | Description
 ------ | ---- | ------- | -----------
-`i` | int | | The zero-based index of the relay (from 0 to 3)
+`relayIndex` | int | | The zero-based index of the relay (from 0 to 3)
 `callback` | function | | `function(error, data) {}`
 
 
