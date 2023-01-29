@@ -338,6 +338,67 @@ null,
 10
 ```
 
+### Switch
+The following methods are used to control a Switch device with relays:
+
+#### `light.hasRelays(callback)`
+Checks to see if the device is a switch with relays. This function is asynchronous.
+
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+`callback` | function | | `function(result) {}`
+
+
+Example result:
+```js
+true
+```
+
+#### `light.getRelayPower(i, callback)`
+Gets the value of the relay at zero-based index i (0-3). This function is asynchronous.
+
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+`i` | int | | The zero-based index of the relay (from 0 to 3)
+`callback` | function | | `function(error, level) {}`
+
+
+Example result:
+```js
+null,
+65535
+```
+
+#### `light.relayOn(i, callback)`
+Turns the relay on. This function is asynchronous.
+
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+`i` | int | | The zero-based index of the relay (from 0 to 3)
+`callback` | function | | `function(error, data) {}`
+
+
+Example result:
+```js
+null,
+65535
+```
+
+#### `light.relayOff(i, callback)`
+Turns the relay off. This function is asynchronous.
+
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+`i` | int | | The zero-based index of the relay (from 0 to 3)
+`callback` | function | | `function(error, data) {}`
+
+
+Example result:
+```js
+null,
+0
+```
+
 ### Labels
 Labels of lights can be requested and set using the following methods:
 
