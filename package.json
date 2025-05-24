@@ -1,7 +1,7 @@
 {
   "name": "lifx-lan-client",
   "description": "Node.js implementation of the LIFX LAN protocol",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": "Marius Rumpf <marius@mariusrumpf.de>",
   "bugs": {
     "url": "https://github.com/node-lifx/lifx-lan-client/issues"
